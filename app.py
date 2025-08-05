@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template
+from collections import deque
 app = Flask(__name__)
 
 def bubble_sort(arr):
@@ -37,14 +38,26 @@ def merge(left, right):
 def quick_sort(arr):
     return sorted_arr
 
+def linear_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    return -1
+
+def binary_search(arr, target):
+    return steps
+
+def dfs(graph, start, visited=None):
+    return visited
+
+def bfs(graph, start, visited=None):
+    return visited
+
 def simulate_stack(arr):
     return operations
 
 def simulate_queue(arr):
     return operations
-
-def binary_search(arr):
-    return steps
 
 
 @app.route('/')
@@ -63,15 +76,25 @@ def process_algorithm():                    #Collects data from frontend and run
         result = merge_sort(array)
     elif algorithm == 'quick':
         result = quick_sort(array)
+    elif algorithm == 'linear_search':
+        result = linear_search(array)
+    elif algorithm == 'binary':
+        target = data.get('target', None)
+        result = binary_search(array, target)
+    elif algorithm == 'dfs':
+        graph = data.get('graph', {})
+        start = data.get('start')
+        result = dfs(graph, start)
+    elif algorithm == 'bfs':
+        graph = data.get('graph', {})
+        start = data.get('start')
+        result = bfs(graph, start)
     elif algorithm == 'stack':
         result = simulate_stack(array)
     elif algorithm == 'queue':
         result = simulate_queue(array)
     elif algorithm == 'bst':
         result = simulate_bst(array)
-    elif algorithm == 'binary':
-        target = data.get('target', None)
-        result = binary_search(array, target)
     else:
         result = "Invalid Algorithm"
 
