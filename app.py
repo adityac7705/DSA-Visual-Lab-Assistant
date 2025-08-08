@@ -55,13 +55,64 @@ def linear_search(arr, target):
     return -1
 
 def binary_search(arr, target):
-    return steps
+    left, right = 0, len(arr) - 1
+    steps = 0
+    
+    while left <= right:
+        steps += 1
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return steps 
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return steps  
+
 
 def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+
+    visited.add(start)
+
+    for neighbor in graph.get(start, []):
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
+
     return visited
 
+
+from collections import deque
+
 def bfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+
+    queue = deque([start])
+    visited.add(start)
+
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
     return visited
+
+def binary_search_tree(arr):
+    if not arr:
+        return None
+
+    mid = len(arr) // 2
+    root = arr[mid]
+    left_subtree = binary_search_tree(arr[:mid])
+    right_subtree = binary_search_tree(arr[mid+1:])
+
+    return {'value': root, 'left': left_subtree, 'right': right_subtree}
+
 
 def simulate_stack(arr):
     return operations
@@ -104,7 +155,7 @@ def process_algorithm():                    #Collects data from frontend and run
     elif algorithm == 'queue':
         result = simulate_queue(array)
     elif algorithm == 'bst':
-        result = simulate_bst(array)
+        result = binary_search_tree(array) 
     else:
         result = "Invalid Algorithm"
 
