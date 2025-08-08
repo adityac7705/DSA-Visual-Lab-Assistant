@@ -87,7 +87,7 @@ def dfs(graph, start, visited=None):
     return visited
 
 
-from collections import deque
+
 
 def bfs(graph, start, visited=None):
     if visited is None:
