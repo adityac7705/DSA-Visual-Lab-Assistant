@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from collections import deque
 app = Flask(__name__)
 
+#--------------------Sorting--------------------
 def bubble_sort(arr):
     arr = arr.copy()
     for i in range(len(arr)):
@@ -47,6 +48,8 @@ def quick_sort(arr):
 
     sorted_array = quick_sort(left) + middle + quick_sort(right)
     return sorted_array
+
+#--------------------Searching--------------------
 
 def linear_search(arr, target):
     for i in range(len(arr)):
@@ -113,12 +116,99 @@ def binary_search_tree(arr):
 
     return {'value': root, 'left': left_subtree, 'right': right_subtree}
 
+class Stack:
+    def __init__(self):
+        self.items = []
 
-def simulate_stack(arr):
-    return operations
+    def push(self, item):
+        self.items.append(item)
+        return self.items.copy()
+    
+    def pop(self):
+        if not self.is_empty():
+            self.items.pop()
+        return self.items.copy()
+    
+    def peek(self):
+        if not self.is_empty():
+            return self.items[-1]
+        return None
+    
+    def is_empty(self):
+        return len(self.items) == 0
 
-def simulate_queue(arr):
-    return operations
+def simulate_stack(operations):
+    s = Stack()
+    steps = []
+
+    for op, value in operations:
+        if op == 'push':
+            state = s.push(value)
+            steps.append({'operation': f'push({value})', 'stack': state})
+        elif op == 'pop':
+            if s.is_empty():
+                steps.append({'operation': f'pop() -> None', 'stack': s.items.copy()})
+            else:
+                popped_value = s.peek()
+                state = s.pop()
+                steps.append({'operation': f'pop() -> {popped_value}', 'stack': state})
+        elif op == 'peek':
+            peek_value = s.peek()
+            state = s.items.copy()
+            steps.append({'operation': f'peek() -> {peek_value}', 'stack': state})
+    return steps
+
+class Queue:
+    def __init__(self):
+        self.items = []
+    
+    def enqueue(self, item):
+        self.items.append(item)
+        return self.items.copy()
+    
+    def dequeue(self):
+        if not self.is_empty():
+            self.items.pop(0)
+        return self.items.copy()
+    
+    def front(self):
+        if not self.is_empty():
+            return self.items[0]
+        return None
+    
+    def rear(self):
+        if not self.is_empty():
+            return self.items[-1]
+        return None
+
+    def is_empty(self):
+        return len(self.items) == 0
+        
+
+def simulate_queue(operations):
+    q = Queue()
+    steps = []
+
+    for op, value in operations:
+        if op == 'enqueue':
+            state = q.enqueue(value)
+            steps.append({'operation': f'enqueue({value})', 'queue': state})
+        elif op == 'dequeue':
+            if q.is_empty():
+                steps.append({'operation': f'dequeue() -> None', 'queue': q.items.copy()})
+            else:
+                dequeued_value = q.front()
+                state = q.dequeue()
+                steps.append({'operation': f'dequeue() -> {dequeued_value}', 'queue': state})
+        elif op == 'front':
+            front_value = q.front()
+            state = q.items.copy()
+            steps.append({'operation': f'front() -> {front_value}', 'queue': state})
+        elif op == 'rear':
+            rear_value = q.rear()
+            state = q.items.copy()
+            steps.append({'operation': f'rear() -> {rear_value}', 'queue': state})
+    return steps
 
 
 @app.route('/')
@@ -138,7 +228,8 @@ def process_algorithm():                    #Collects data from frontend and run
     elif algorithm == 'quick':
         result = quick_sort(array)
     elif algorithm == 'linear_search':
-        result = linear_search(array)
+        target = data.get('target', None)
+        result = linear_search(array, target)
     elif algorithm == 'binary':
         target = data.get('target', None)
         result = binary_search(array, target)
