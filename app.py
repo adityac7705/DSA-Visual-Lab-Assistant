@@ -74,36 +74,36 @@ def binary_search(arr, target):
     return steps  
 
 
-def dfs(graph, start, visited=None):
-    if visited is None:
-        visited = set()
+def dfs(graph, start):
+    visited = set()
+    result = []
 
-    visited.add(start)
+    def dfs_recursive(node):
+        if node not in visited:
+            visited.add(node)
+            result.append(node)
+            for neighbor in graph.get(node, []):
+                dfs_recursive(neighbor)
 
-    for neighbor in graph.get(start, []):
-        if neighbor not in visited:
-            dfs(graph, neighbor, visited)
-
-    return visited
+    dfs_recursive(start)
+    return result
 
 
-
-
-def bfs(graph, start, visited=None):
-    if visited is None:
-        visited = set()
-
+def bfs(graph, start):
+    visited = set()
     queue = deque([start])
-    visited.add(start)
+    result = []
 
     while queue:
         node = queue.popleft()
-        for neighbor in graph.get(node, []):
-            if neighbor not in visited:
-                visited.add(neighbor)
-                queue.append(neighbor)
+        if node not in visited:
+            visited.add(node)
+            result.append(node)
+            queue.extend(graph.get(node, []))
 
-    return visited
+    return result
+
+#--------------------Data Structures--------------------
 
 def binary_search_tree(arr):
     if not arr:
