@@ -36,7 +36,17 @@ def merge(left, right):
     return result
 
 def quick_sort(arr):
-    return sorted_arr
+    if len(arr) <= 1:
+        return arr
+
+    pivot = arr[len(arr) // 2]
+
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+
+    sorted_array = quick_sort(left) + middle + quick_sort(right)
+    return sorted_array
 
 def linear_search(arr, target):
     for i in range(len(arr)):
