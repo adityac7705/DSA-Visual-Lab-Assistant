@@ -52,10 +52,14 @@ def quick_sort(arr):
 #--------------------Searching--------------------
 
 def linear_search(arr, target):
+    steps = []
     for i in range(len(arr)):
+        steps.append({'action': 'check', 'index': i, 'value': arr[i]})
         if arr[i] == target:
-            return i
-    return -1
+            steps.append({'action': 'found','index': i, 'value': arr[i]})
+            return steps
+    steps.append({'action': 'not_found', 'index': -1, 'value': None})
+    return steps
 
 def binary_search(arr, target):
     left, right = 0, len(arr) - 1
@@ -251,7 +255,7 @@ def process_algorithm():                    #Collects data from frontend and run
         result = "Invalid Algorithm"
 
 
-    return jsonify({'result': result})
+    return jsonify({'steps': result})
 
 if __name__ == '__main__':
     app.run(debug=True)
