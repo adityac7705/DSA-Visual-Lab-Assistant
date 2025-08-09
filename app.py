@@ -55,25 +55,25 @@ def quick_sort(arr):
 def linear_search(arr, target):
     steps = []
     for i in range(len(arr)):
-        # Change 'action' to 'status' and use 'checking'
         steps.append({'status': 'checking', 'index': i, 'value': arr[i]})
-        if arr[i] == target:
-            # Add 'final: True' for the found state
+        # Compare as strings to support both numbers and other data types
+        if str(arr[i]) == str(target):
             steps.append({'status': 'found','index': i, 'value': arr[i], 'final': True})
             return steps
-    # Add 'final: True' for the not_found state
     steps.append({'status': 'not_found', 'index': -1, 'value': None, 'final': True})
     return steps
 
 def binary_search(arr, target):
     left, right = 0, len(arr) - 1
-    steps = 0 # This needs to be changed to capture visualization steps for the frontend
+    steps = []
     
     while left <= right:
-        steps += 1
         mid = (left + right) // 2
+        
+        # Check if array is sorted, otherwise binary search won't work
         if arr[mid] == target:
-            return steps 
+            # You would add visualization steps here
+            return steps
         elif arr[mid] < target:
             left = mid + 1
         else:
@@ -219,19 +219,15 @@ def simulate_queue(operations):
             steps.append({'operation': f'rear() -> {rear_value}', 'queue': state})
     return steps
 
-
 @app.route('/')
 def index():
-    # Ensure this matches the HTML file name you are using, e.g., 'linear_search.html'
-    return render_template('index.html') # Assuming you renamed 'index.html' to 'linear_search.html'
+    return render_template('index.html')
 
 @app.route('/process', methods=['POST'])
-def process_algorithm(): 
+def process_algorithm():
     data = request.json
     algorithm = data['algorithm']
-    array = data['array']
-
-    result = [] # Initialize result to an empty list or appropriate default
+    array = data.get('array')
 
     if algorithm == 'bubble':
         result = bubble_sort(array)
@@ -244,10 +240,7 @@ def process_algorithm():
         result = linear_search(array, target)
     elif algorithm == 'binary':
         target = data.get('target', None)
-        # binary_search currently returns only steps count, not visualization steps
-        # You'll need to modify binary_search to return a list of visualization steps similar to linear_search
-        # For now, it will just return the number of steps, which the frontend might not interpret correctly
-        result = binary_search(array, target) 
+        result = binary_search(array, target)
     elif algorithm == 'dfs':
         graph = data.get('graph', {})
         start = data.get('start')
@@ -264,10 +257,8 @@ def process_algorithm():
         result = binary_search_tree(array) 
     else:
         result = "Invalid Algorithm"
-        # For invalid algorithm, consider returning an error status with jsonify
         return jsonify({'error': result}), 400
 
-    # Ensure the JSON key here is 'result' to match frontend (const steps = data.result;)
     return jsonify({'result': result})
 
 if __name__ == '__main__':

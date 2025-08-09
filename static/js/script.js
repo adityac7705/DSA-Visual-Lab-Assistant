@@ -80,22 +80,33 @@ function drawArrow(startX, startY, endX, endY, elementId) {
 async function visualizeLinearSearch() {
     const arrayString = arrayInput.value;
     const targetString = targetInput.value;
+    const MAX_ARRAY_SIZE_FOR_ANIMATION = 20;
 
     if (!arrayString || !targetString) {
         alert('Please enter both array and target values.'); 
         return;
     }
-    const array = arrayString.split(',').map(num => parseInt(num.trim(), 10)).filter(Number.isFinite);
-    const target = parseInt(targetString.trim(), 10);
+    
+    // Parse array without converting to numbers, accepting strings.
+    const array = arrayString.split(',').map(item => item.trim());
+    
+    // Use the target string directly.
+    const target = targetString.trim();
 
-    if (array.length === 0 || isNaN(target)) {
-        alert('Invalid array or target input. Use comma-separated numbers.'); 
+    if (array.length === 0 || target === '') {
+        alert('Invalid array or target input. Use comma-separated values.'); 
         return;
     }
 
     initializeVisualization();
     
-    renderArray(array); 
+    // Solution for large arrays: Disable visualization but still get result.
+    const isArrayTooLarge = array.length > MAX_ARRAY_SIZE_FOR_ANIMATION;
+    if (isArrayTooLarge) {
+        alert(`The array is too large (${array.length} elements). Visualization will be skipped for performance, but the result will be displayed.`);
+    } else {
+        renderArray(array); 
+    }
 
     loadingIndicator.style.display = 'block'; 
     visualizeBtn.disabled = true; 
@@ -109,7 +120,7 @@ async function visualizeLinearSearch() {
             },
             body: JSON.stringify({
                 algorithm: 'linear_search',
-                array: array,
+                array: array, 
                 target: target
             }),
         });
@@ -118,11 +129,11 @@ async function visualizeLinearSearch() {
         if (!contentType || !contentType.includes('application/json')) {
             const errorText = await response.text(); 
             console.error('Server response was not JSON:', errorText);
-            resultMessage.textContent = 'Server returned unexpected format. Expected JSON. Check console.';
+            resultMessage.textContent = 'Server returned unexpected format. Check console.';
             resultMessage.classList.remove('text-info');
             resultMessage.classList.add('text-error');
             loadingIndicator.style.display = 'none';
-            throw new Error('Server returned unexpected format. Expected JSON. Please ensure your Flask backend is running and the /process endpoint is correctly configured to return JSON. Check your browser\'s console for the server\'s full response (likely an HTML error page).');
+            throw new Error('Server returned unexpected format. Please ensure your Flask backend is running and the /process endpoint is correctly configured to return JSON.');
         }
         
         const data = await response.json(); 
@@ -144,87 +155,101 @@ async function visualizeLinearSearch() {
             loadingIndicator.style.display = 'none';
             return;
         }
+
         loadingIndicator.style.display = 'none';
-        searchCursor.classList.add('active'); 
-        let prevElementRect = null; 
-        for (let i = 0; i < steps.length; i++) {
-            const step = steps[i];
-            const currentElement = arrayContainer.querySelector(`[data-index="${step.index}"]`);
-            const prevArrow = arrowSvgContainer.querySelector('.current-arrow');
-            if (prevArrow) {
-                prevArrow.remove();
-            }
-            if (currentElement) {
-                arrayContainer.querySelectorAll('.array-element').forEach(el => {
-                    el.classList.remove('found'); 
-                });
-                for (let j = 0; j <= step.index; j++) {
-                    const elementToReveal = arrayContainer.querySelector(`[data-index="${j}"]`);
-                    if (elementToReveal) {
-                        elementToReveal.classList.remove('unseen');
-                        elementToReveal.style.opacity = '1';
-                        elementToReveal.style.filter = 'none'; 
-                        elementToReveal.style.transform = 'scale(1)'; 
-                    }
+
+        if (isArrayTooLarge) {
+             const finalStep = steps[steps.length - 1];
+             if (finalStep.status === 'found') {
+                resultMessage.textContent = `Target '${target}' found at index ${finalStep.index}.`;
+                resultMessage.className = 'text-success';
+             } else {
+                resultMessage.textContent = `Target '${target}' not found in the array.`;
+                resultMessage.className = 'text-error';
+             }
+        } else {
+             // Existing visualization logic for small arrays
+            searchCursor.classList.add('active'); 
+            let prevElementRect = null; 
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                const currentElement = arrayContainer.querySelector(`[data-index="${step.index}"]`);
+                const prevArrow = arrowSvgContainer.querySelector('.current-arrow');
+                if (prevArrow) {
+                    prevArrow.remove();
                 }
-                const currentElementRect = currentElement.getBoundingClientRect();
-                const containerRect = arrayContainer.getBoundingClientRect(); 
-                const cursorTargetX = (currentElementRect.left + currentElementRect.width / 2) - containerRect.left;
-                searchCursor.style.left = `${cursorTargetX}px`;
-                let arrowStartX_relative, arrowEndX_relative;
-                const arrowVerticalCenterY = (currentElementRect.top + currentElementRect.height / 2) - containerRect.top;
-
-                if (i === 0) {
-                    const firstElementLeftEdge_relative = currentElementRect.left - containerRect.left;
-                    arrowStartX_relative = firstElementLeftEdge_relative - 10; 
-                    arrowEndX_relative = firstElementLeftEdge_relative + (currentElementRect.width * 0.2); 
-                } else {
-                    arrowStartX_relative = prevElementRect.left + prevElementRect.width; 
-                    arrowEndX_relative = currentElementRect.left - containerRect.left; 
-                }
-                if (step.status === 'checking') {
-                    if (step.value === target) {
-                        resultMessage.textContent = `Checking index ${step.index} (Value: ${step.value})... It's a match! `;
-                    } else {
-                        resultMessage.textContent = `Checking index ${step.index} (Value: ${step.value})... Not a match. Moving on.`;
-                    }
-                    resultMessage.className = 'text-info';
-                    drawArrow(arrowStartX_relative, arrowVerticalCenterY, arrowEndX_relative, arrowVerticalCenterY, 'current-arrow');
-
-                } else if (step.status === 'found') {
-                    await new Promise(resolve => setTimeout(resolve, animationDelay / 2)); 
-
-                    currentElement.classList.add('found');
-                    resultMessage.textContent = `Target ${target} found at index ${step.index}! `;
-                    resultMessage.className = 'text-success';
-                    searchCursor.classList.remove('active'); 
-                    const finalArrow = arrowSvgContainer.querySelector('.current-arrow');
-                    if (finalArrow) {
-                        finalArrow.remove();
-                    }
-                    break; 
-                } else if (step.status === 'not_found' && step.final) {
-                    await new Promise(resolve => setTimeout(resolve, animationDelay / 2)); 
-
+                if (currentElement) {
                     arrayContainer.querySelectorAll('.array-element').forEach(el => {
-                        el.classList.remove('found');
+                        el.classList.remove('found'); 
                     });
-                    resultMessage.textContent = `Target ${target} not found in the array. `;
-                    resultMessage.className = 'text-error';
-                    searchCursor.classList.remove('active'); 
-                    const finalArrow = arrowSvgContainer.querySelector('.current-arrow');
-                    if (finalArrow) {
-                        finalArrow.remove();
+                    for (let j = 0; j <= step.index; j++) {
+                        const elementToReveal = arrayContainer.querySelector(`[data-index="${j}"]`);
+                        if (elementToReveal) {
+                            elementToReveal.classList.remove('unseen');
+                            elementToReveal.style.opacity = '1';
+                            elementToReveal.style.filter = 'none'; 
+                            elementToReveal.style.transform = 'scale(1)'; 
+                        }
                     }
+                    const currentElementRect = currentElement.getBoundingClientRect();
+                    const containerRect = arrayContainer.getBoundingClientRect(); 
+                    const cursorTargetX = (currentElementRect.left + currentElementRect.width / 2) - containerRect.left;
+                    searchCursor.style.left = `${cursorTargetX}px`;
+                    let arrowStartX_relative, arrowEndX_relative;
+                    const arrowVerticalCenterY = (currentElementRect.top + currentElementRect.height / 2) - containerRect.top;
+
+                    if (i === 0) {
+                        const firstElementLeftEdge_relative = currentElementRect.left - containerRect.left;
+                        arrowStartX_relative = firstElementLeftEdge_relative - 10; 
+                        arrowEndX_relative = firstElementLeftEdge_relative + (currentElementRect.width * 0.2); 
+                    } else {
+                        arrowStartX_relative = prevElementRect.left + prevElementRect.width; 
+                        arrowEndX_relative = currentElementRect.left - containerRect.left; 
+                    }
+                    if (step.status === 'checking') {
+                        if (String(step.value) === String(target)) {
+                            resultMessage.textContent = `Checking index ${step.index} (Value: ${step.value})... It's a match! `;
+                        } else {
+                            resultMessage.textContent = `Checking index ${step.index} (Value: ${step.value})... Not a match. Moving on.`;
+                        }
+                        resultMessage.className = 'text-info';
+                        drawArrow(arrowStartX_relative, arrowVerticalCenterY, arrowEndX_relative, arrowVerticalCenterY, 'current-arrow');
+
+                    } else if (step.status === 'found') {
+                        await new Promise(resolve => setTimeout(resolve, animationDelay / 2)); 
+
+                        currentElement.classList.add('found');
+                        resultMessage.textContent = `Target ${target} found at index ${step.index}! `;
+                        resultMessage.className = 'text-success';
+                        searchCursor.classList.remove('active'); 
+                        const finalArrow = arrowSvgContainer.querySelector('.current-arrow');
+                        if (finalArrow) {
+                            finalArrow.remove();
+                        }
+                        break; 
+                    } else if (step.status === 'not_found' && step.final) {
+                        await new Promise(resolve => setTimeout(resolve, animationDelay / 2)); 
+
+                        arrayContainer.querySelectorAll('.array-element').forEach(el => {
+                            el.classList.remove('found');
+                        });
+                        resultMessage.textContent = `Target ${target} not found in the array. `;
+                        resultMessage.className = 'text-error';
+                        searchCursor.classList.remove('active'); 
+                        const finalArrow = arrowSvgContainer.querySelector('.current-arrow');
+                        if (finalArrow) {
+                            finalArrow.remove();
+                        }
+                    }
+                    prevElementRect = {
+                        left: currentElementRect.left - containerRect.left,
+                        width: currentElementRect.width,
+                        top: currentElementRect.top - containerRect.top
+                    };
                 }
-                prevElementRect = {
-                    left: currentElementRect.left - containerRect.left,
-                    width: currentElementRect.width,
-                    top: currentElementRect.top - containerRect.top
-                };
-            }
-            if (!step.final) {
-                await new Promise(resolve => setTimeout(resolve, animationDelay));
+                if (!step.final) {
+                    await new Promise(resolve => setTimeout(resolve, animationDelay));
+                }
             }
         }
     } catch (error) {
