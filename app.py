@@ -221,7 +221,7 @@ def simulate_queue(operations):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('linear_search.html')
 
 @app.route('/process', methods=['POST'])
 def process_algorithm():
