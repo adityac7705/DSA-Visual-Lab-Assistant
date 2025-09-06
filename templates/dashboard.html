@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DSA Studio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #0f0f1a;
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.85);
+    }
+    .navbar .nav-link {
+      color: #fff !important;
+      margin-right: 15px;
+    }
+    .navbar .nav-link:hover {
+      color: #54ACBF !important;
+    }
+
+    .hero {
+      background: url('955f9a44-c441-42fc-8ea4-7dbd092b0d29.png') no-repeat center center/cover;
+      height: 70vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #fff;
+      position: relative;
+      margin-top: 56px;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .typing-text {
+      font-size: 3rem;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #fff;
+      width: 0;
+      margin: 0 auto;
+      animation: typing 4s steps(30, end) forwards, blink 0.7s infinite;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      color: #cfd8ff;
+    }
+
+    .start-btn {
+      margin-top: 20px;
+      background: linear-gradient(90deg, #54ACBF, #023859);
+      border: none;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+    }
+    .start-btn:hover {
+      background: linear-gradient(90deg, #26658C, #011C40);
+      color: white;
+    }
+
+    .card {
+      border-radius: 15px;
+      border: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    h2 {
+      color: white;
+    }
+
+    footer {
+      background: #011C40;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold text-white" href="#">
+      <img src="Logo-removebg-preview.png" alt="Logo" height="50" width="60" class="me-2"> DSA Studio
+    </a>
+    <div>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="test.html">Quiz</a></li>
+        <li class="nav-item"><a class="nav-link" href="#applications">Applications</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="typing-text">Let's Visualize our DSA</h1>
+    <p>Interactive animations to understand Data Structures & Algorithms</p>
+    <a href="explore.html" class="start-btn">🚀 Start Visualization</a>
+  </div>
+</section>
+
+<style>
+.typing-text {
+  font-size: 3rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+  margin: 0 auto;
+  animation: typing 4s steps(30, end) forwards;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+</style>
+
+<section class="py-5" id="applications">
+  <div class="container">
+    <h2 class="text-center mb-5 fw-bold">Real-Life Applications of DSA</h2>
+    <div class="row g-4">
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background:#023859;">
+          <img src="https://img.icons8.com/fluency/48/map.png" class="mx-auto d-block mt-2" alt="Maps">
+          <h5 class="mt-3">Maps & Navigation</h5>
+          <p class="small">Graphs & shortest path algorithms power Google Maps route finding.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background:#26658C;">
+          <img src="https://img.icons8.com/fluency/48/google-logo.png" class="mx-auto d-block mt-2" alt="Search">
+          <h5 class="mt-3">Search Engines</h5>
+          <p class="small">Efficient search algorithms help deliver accurate results instantly.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-center p-3" style="background:#54ACBF; color:black;">
+          <img src="https://img.icons8.com/fluency/48/facebook-new.png" class="mx-auto d-block mt-2" alt="Social">
+          <h5 class="mt-3">Social Media</h5>
+          <p class="small">Graphs represent friendships, followers & connections in networks.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background:#011C40;">
+          <img src="https://img.icons8.com/fluency/48/shopping-cart.png" class="mx-auto d-block mt-2" alt="E-Commerce">
+          <h5 class="mt-3">E-Commerce</h5>
+          <p class="small">Recommendation engines use hashing, graphs & sorting for products.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background: linear-gradient(135deg,#6a11cb,#2575fc);">
+          <img src="https://img.icons8.com/color/96/server.png" class="mx-auto" alt="OS">
+          <h5 class="mt-3">Operating Systems</h5>
+          <p class="small">Scheduling algorithms manage CPU & processes.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background: linear-gradient(135deg,#2575fc,#6a11cb);">
+          <img src="https://img.icons8.com/color/96/artificial-intelligence.png" class="mx-auto" alt="AI">
+          <h5 class="mt-3">Artificial Intelligence</h5>
+          <p class="small">Search & DP help in AI planning & ML models.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background: linear-gradient(135deg,#ff4fd8,#6a11cb);">
+          <img src="https://img.icons8.com/color/96/database.png" class="mx-auto" alt="Database">
+          <h5 class="mt-3">Databases</h5>
+          <p class="small">Trees & hashing power indexing & query optimization.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 text-white text-center p-3" style="background: linear-gradient(135deg,#2575fc,#ff4fd8);">
+          <img src="https://img.icons8.com/color/96/robot-2.png" class="mx-auto" alt="Robotics">
+          <h5 class="mt-3">Robotics</h5>
+          <p class="small">Pathfinding guides robots in navigation & obstacles.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center py-4">
+  <div class="container">
+    <p class="mb-3">Connect with us</p>
+    <a href="https://instagram.com" target="_blank" class="me-3">
+      <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Instagram">
+    </a>
+    <a href="https://twitter.com" target="_blank" class="me-3">
+      <img src="https://img.icons8.com/fluency/48/twitter.png" alt="Twitter">
+    </a>
+    <a href="https://linkedin.com" target="_blank" class="me-3">
+      <img src="https://img.icons8.com/fluency/48/linkedin.png" alt="LinkedIn">
+    </a>
+    <hr class="mt-4 mb-2" style="border-color: #26658C;">
+    <p class="small mb-0">&copy; 2025 DSA Studio. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
