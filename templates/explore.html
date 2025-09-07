@@ -34,31 +34,47 @@
     .list-group-item:hover {
       background: #033E73;
     }
+    .navbar {
+      background: rgba(0, 0, 0, 0.85);
+    }
+    .navbar .nav-link {
+      color: #fff !important;
+      margin-right: 15px;
+    }
+    .navbar .nav-link:hover {
+      color: #54ACBF !important;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
+
   <nav class="navbar navbar-expand-lg" style="background: #011C40;">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center text-white fw-bold" href="index.html">
-        <img src="logo.png" alt="Logo" width="40" height="40" class="me-2">
-        DSA Visual Lab
+      <a class="navbar-brand d-flex align-items-center text-white fw-bold">
+        <img src="Logo-removebg-preview.png" alt="Logo" width="40" height="40" class="me-2" href="index.html">
+        DSA Studio
       </a>
+      <div>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="test.html">Quiz</a></li>
+        <li class="nav-item"><a class="nav-link" href="#applications">Applications</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
     </div>
   </nav>
 
-  <!-- Header -->
   <div class="header">
     <h1>📚 Explore Data Structures & Algorithms</h1>
     <p>Choose a topic below to start your journey</p>
   </div>
 
-  <!-- Explore Section -->
   <div class="container pb-5">
     <div class="row g-4">
 
-      <!-- Searching -->
 <div class="col-md-3">
   <div class="card h-100 shadow" style="background:#023E73; color:white;">
     <div class="card-body text-center">
@@ -75,7 +91,6 @@
   </div>
 </div>
 
-      <!-- Sorting -->
       <div class="col-md-3">
         <div class="card h-100 shadow" style="background:#024C88; color:white;">
           <div class="card-body text-center">
@@ -94,7 +109,6 @@
         </div>
       </div>
 
-      <!-- Stack -->
       <div class="col-md-3">
         <div class="card h-100 shadow" style="background:#025C99; color:white;">
           <div class="card-body text-center">
@@ -112,7 +126,6 @@
         </div>
       </div>
 
-      <!-- Queue -->
       <div class="col-md-3">
         <div class="card h-100 shadow" style="background:#0360A0; color:white;">
           <div class="card-body text-center">
@@ -134,7 +147,6 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="text-center text-white py-4" style="background: #011C40;">
     <div class="container">
       <p class="mb-3">Connect with us</p>

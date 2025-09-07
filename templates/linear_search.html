@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linear Search Visualizer</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #121212;
@@ -17,6 +19,7 @@
             min-height: 100vh;
             padding: 1rem;
         }
+
         .container {
             width: 100%;
             max-width: 42rem;
@@ -26,28 +29,35 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             border: 1px solid #374151;
         }
+
         h1 {
-            font-size: 2.25rem;
+            font-size: 3rem;
             font-weight: 700;
             text-align: center;
             margin-bottom: 1.5rem;
+            color: #a78bfa;
+            font-family: Georgia, 'Times New Roman', Times, serif;
         }
+
         p {
             text-align: center;
             color: #9ca3af;
             margin-bottom: 2rem;
         }
+
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
+
         label {
             display: block;
             font-size: 0.875rem;
             font-weight: 500;
             color: #d1d5db;
         }
+
         input {
             display: block;
             width: 100%;
@@ -58,11 +68,13 @@
             background-color: #374151;
             color: #d1d5db;
         }
+
         input:focus {
             outline: none;
             border-color: #6366f1;
             box-shadow: 0 0 0 1px #6366f1, 0 0 0 1px rgba(99, 102, 241, 0.5);
         }
+
         .button {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -76,26 +88,31 @@
             transition-duration: 200ms;
             transform-origin: center;
         }
+
         .button:hover {
             background-color: #9333ea;
             transform: scale(1.05);
         }
+
         .visualization-area {
             margin-top: 2.5rem;
         }
+
         .visualization-area h2 {
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
-            color: #d1d5db;
+            color: #d9d1db;
             margin-bottom: 1.5rem;
         }
+
         .array-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 1rem;
         }
+
         .array-item {
             width: 4rem;
             height: 4rem;
@@ -111,15 +128,18 @@
             background-color: #a78bfa;
             color: #3730a3;
         }
+
         .array-item.checking {
             background-color: #fcd34d;
             transform: scale(1.1);
         }
+
         .array-item.found {
             background-color: #34d399;
             color: white;
             transform: scale(1.1);
         }
+
         .status-message {
             margin-top: 2rem;
             font-size: 1.125rem;
@@ -131,12 +151,45 @@
             background-color: #374151;
             border: 1px solid #4b5563;
         }
+
+        .theory {
+            color: #d1d5db;
+            text-align: justify;
+        }
+        .steps{
+            margin: 5px 0;
+            text-align: justify;
+            color: #d1d5db;
+        }
+        #s1{
+            font-size: 1.5rem;
+            text-decoration: underline;
+        }
+        #heading{
+            text-align: center;
+            font-size: 2rem;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Linear Search Visualizer</h1>
-        <p>Enter a list of numbers and a target value to see the search in action.</p>
+        <p class="theory">Linear search is the most basic searching technique that checks each element in a list
+            sequentially until the desired element is found or the list ends. It can be applied to both sorted and
+            unsorted data, making it versatile but not efficient for large datasets. The algorithm has a time complexity
+            of O(n) and a space complexity of O(1), which means it requires no extra memory. Although simple to
+            implement, it is mainly suitable for small datasets.</p>
+        <p class="steps" id="s1">How to solve linear search</p>    
+        <p class="steps">step 1: Start from the first element of the array.</p>
+        <p class="steps">step 2: Compare the current element with the target element.</p>
+        <p class="steps">step 3: If they match, return the index (or position) of the element.</p>
+        <p class="steps">step 4: If not, move to the next element in the list.</p>
+        <p class="steps">step 5: Repeat steps 2–4 until you either find the element or reach the end of the list.</p>
+        <p class="steps"> step 6: If the end is reached without a match, return "not found</p><br>
+        <h2 id="heading">Visualization</h2>
+
         <div class="input-group">
             <div>
                 <label for="arrayInput">Array (comma-separated):</label>
@@ -151,7 +204,6 @@
             </button>
         </div>
         <div id="visualization" class="visualization-area">
-            <h2>Visualization</h2>
             <div id="arrayContainer" class="array-container">
             </div>
             <div id="statusMessage" class="status-message">
@@ -244,4 +296,5 @@
         });
     </script>
 </body>
+
 </html>
