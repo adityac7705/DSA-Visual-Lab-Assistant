@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-3">Algorithm Visualization</h2>
+<div class="row mb-3">
+  <div class="col-md-4">
+    <select id="algo-select" class="form-select">
+      <option value="">--Select Algorithm--</option>
+      <option value="bubble">Bubble Sort</option>
+      <option value="merge">Merge Sort</option>
+      <option value="quick">Quick Sort</option>
+      <option value="linear">Linear Search</option>
+      <option value="binary">Binary Search</option>
+      <option value="stack">Stack</option>
+      <option value="queue">Queue</option>
+      <option value="bst">Binary Search Tree</option>
+      <option value="dfs">DFS</option>
+      <option value="bfs">BFS</option>
+    </select>
+  </div>
+  <div class="col-md-8" id="input-area"></div>
+</div>
+
+<button onclick="runAlgorithm()" class="btn btn-success mb-4">Visualize</button>
+
+<div id="visualization-area" class="border rounded p-3" style="min-height: 300px; background: #f8f9fa; overflow-x: auto;"></div>
+
+<script src="/static/js/visualization.js"></script>
+{% endblock %}
