@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stack Visualization - Luna Theme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #1f1f2e;
+            font-family: 'Poppins', sans-serif;
+        }
+        .stack-visual {
+            display: flex;
+            flex-direction: column-reverse;
+            border-left: 3px solid #7f5af0;
+            border-right: 3px solid #7f5af0;
+            border-bottom: 3px solid #7f5af0;
+            transition: opacity 0.5s ease-out;
+            background: rgba(63, 63, 70, 0.2);
+            border-radius: 6px;
+            position: relative;
+            padding-top: 5px;
+        }
+        .stack-element {
+            width: 100%;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        .stack-element:hover {
+            transform: scale(1.05);
+            background: #9f7aea;
+        }
+        .top-indicator {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #facc15;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 p-8 text-gray-100">
+
+    <h1 class="text-4xl font-bold text-center text-purple-400 mb-8">Stack Visualization 💻</h1>
+
+    <div class="flex flex-col md:flex-row gap-8">
+
+        <!-- Left Panel: Stack Theory + Input -->
+        <div class="flex flex-col w-full md:w-1/3 gap-6">
+            
+            <!-- Stack Theory -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-xl font-semibold mb-4 text-purple-400">Stack Theory 📚</h2>
+                <p class="text-gray-200 text-sm mb-2">
+                    A <strong>Stack</strong> is a linear data structure following <strong>LIFO</strong> (Last In, First Out). 
+                    The last element added is the first removed.
+                </p>
+                <p class="text-gray-200 text-sm mb-2">Common operations include:</p>
+                <ul class="list-disc list-inside text-gray-300 text-sm mb-2">
+                    <li><strong>Push:</strong> Add element on top.</li>
+                    <li><strong>Pop:</strong> Remove element from top.</li>
+                    <li><strong>Peek / Top:</strong> View top element without removing.</li>
+                    <li><strong>isEmpty:</strong> Check if stack is empty.</li>
+                </ul>
+                <p class="text-gray-200 text-sm">Stacks are used in function calls, undo actions, expression evaluation, and DFS traversal.</p>
+            </div>
+
+            <!-- Input Panel -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-xl font-semibold mb-4 text-purple-400">Define Operations</h2>
+                <textarea id="opsInput" rows="6"
+                    class="w-full p-3 bg-gray-900 border border-purple-500 rounded-lg text-gray-100 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Enter operations line by line (e.g., push 10, pop)">push 10
+push 20
+pop
+push 30
+pop
+pop</textarea>
+                
+                <button id="loadOpsBtn"
+                    class="w-full mt-4 py-2 px-4 rounded-lg font-bold bg-purple-500 hover:bg-purple-600 text-white transition-all">
+                    Load & Fetch Steps
+                </button>
+
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-2 text-purple-400">Control</h3>
+                    <button id="nextStepBtn"
+                        class="w-full py-3 px-4 rounded-lg font-bold bg-teal-500 hover:bg-teal-600 text-gray-900 disabled:bg-gray-600 transition-all">
+                        Simulate Next Step (Step <span id="currentStepCount">0</span>/<span id="totalStepsCount">0</span>)
+                    </button>
+                </div>
+
+                <div class="mt-4 p-3 bg-gray-800 border-l-4 border-purple-400 text-purple-300 text-sm rounded">
+                    **Last Action:** <span id="currentOpDisplay" class="font-medium">N/A</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Visualization -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg w-full md:w-2/3 flex flex-col border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4 text-purple-400">Operation Steps History</h2>
+            <div id="history-container"
+                class="flex gap-8 p-4 overflow-x-auto items-end h-full min-h-[250px] rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/run-algo';
+        const historyContainer = document.getElementById('history-container');
+        const opsInput = document.getElementById('opsInput');
+        const loadOpsBtn = document.getElementById('loadOpsBtn');
+        const nextStepBtn = document.getElementById('nextStepBtn');
+        const currentOpDisplay = document.getElementById('currentOpDisplay');
+        const currentStepCount = document.getElementById('currentStepCount');
+        const totalStepsCount = document.getElementById('totalStepsCount');
+
+        let allSteps = [];
+        let currentStepIndex = 0;
+
+        function renderStep(step) {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'stack-step flex flex-col items-center min-w-[100px] pb-4';
+
+            const stackVisual = document.createElement('div');
+            stackVisual.className = 'stack-visual w-[70px] h-40 opacity-0';
+
+            // Add Top Indicator
+            if (step.stack && step.stack.length > 0) {
+                const topIndicator = document.createElement('div');
+                topIndicator.className = 'top-indicator';
+                topIndicator.textContent = 'TOP';
+                stackVisual.appendChild(topIndicator);
+            }
+
+            if (step.stack) {
+                step.stack.forEach(val => {
+                    const element = document.createElement('div');
+                    element.className = 'stack-element h-10 bg-purple-600 border border-purple-400 text-white flex items-center justify-center font-semibold text-lg';
+                    element.textContent = val;
+                    stackVisual.appendChild(element);
+                });
+            }
+
+            const label = document.createElement('div');
+            label.className = 'step-label mt-4 font-bold uppercase text-purple-300 text-sm';
+            if (step.action === 'push') {
+                label.textContent = `PUSH ${step.value}`;
+            } else if (step.action === 'pop') {
+                label.textContent = `POP ${step.value}`;
+            } else {
+                label.textContent = step.action.toUpperCase();
+            }
+
+            stepDiv.appendChild(stackVisual);
+            stepDiv.appendChild(label);
+            historyContainer.appendChild(stepDiv);
+
+            setTimeout(() => stackVisual.classList.remove('opacity-0'), 10);
+            historyContainer.scrollLeft = historyContainer.scrollWidth;
+            currentOpDisplay.textContent = label.textContent;
+        }
+
+        async function loadOperations() {
+            historyContainer.innerHTML = '';
+            const rawOps = opsInput.value.trim().split('\n').filter(line => line.trim() !== '');
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ algo: "stack", ops: rawOps })
+            });
+
+            const result = await response.json();
+            allSteps = result.steps || [];
+
+            currentStepIndex = 0;
+            if (allSteps.length > 0) {
+                renderStep(allSteps[0]);
+                currentStepIndex = 1;
+            }
+
+            nextStepBtn.disabled = allSteps.length <= 1;
+            updateControls();
+        }
+
+        function handleNextStep() {
+            if (currentStepIndex < allSteps.length) {
+                renderStep(allSteps[currentStepIndex]);
+                currentStepIndex++;
+                updateControls();
+            }
+        }
+
+        function updateControls() {
+            currentStepCount.textContent = currentStepIndex;
+            totalStepsCount.textContent = allSteps.length;
+            if (currentStepIndex === allSteps.length) {
+                nextStepBtn.disabled = true;
+                nextStepBtn.textContent = "Simulation Finished! Reset to Run Again.";
+            } else {
+                nextStepBtn.textContent = `Simulate Step ${currentStepIndex} of ${allSteps.length}`;
+            }
+        }
+
+        loadOpsBtn.addEventListener('click', loadOperations);
+        nextStepBtn.addEventListener('click', handleNextStep);
+    </script>
+</body>
+</html>

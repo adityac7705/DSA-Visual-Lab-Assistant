@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Visualizer - DSA Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base Styles */
+        body {
+            background-color: #1f2937; 
+            color: #d1d5db; 
+            font-family: 'Poppins', sans-serif;
+        }
+        /* INCREASED SIZE: Max width changed from 42rem to 60rem */
+        .visualizer-container {
+            width: 100%; max-width: 60rem; /* Increased size */
+            background-color: #1f2937;
+            padding: 3rem; 
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            border: 1px solid #374151; 
+            margin: 3rem auto; 
+        }
+        /* INCREASED FONT SIZE */
+        h1 { color: #a78bfa; font-family: Georgia, serif; font-size: 2.5rem; }
+        h2 { font-size: 1.8rem; }
+        
+        .input-group input {
+            background-color: #374151; border: 1px solid #4b5563; 
+            padding: 1rem; 
+            border-radius: 0.375rem; color: #d1d5db;
+            width: 100%;
+            font-size: 1.1rem; 
+        }
+        .input-group label { color: #d1d5db; font-size: 1rem; font-weight: 500;} 
+        .button {
+            background-color: #a855f7; transition: transform 0.2s ease;
+            width: 100%; padding: 1rem 1rem; 
+            color: white; font-weight: 600; border-radius: 0.5rem;
+            font-size: 1.2rem; 
+        }
+        .button:hover { background-color: #9333ea; transform: scale(1.05); }
+
+        /* Visualization Styles */
+        .visualization-area { 
+            position: relative; 
+            padding-top: 5rem; 
+            margin-top: 3rem; 
+        }
+        /* FIX 1: Force single row and allow shrinking */
+        .array-container {
+            display: flex; 
+            flex-wrap: nowrap; /* Forces all items onto a single line */
+            justify-content: center; 
+            gap: 0.5rem; /* Reduced gap for more space */
+            margin-bottom: 1rem; 
+            overflow-x: auto; /* Allows horizontal scrolling if array is very long */
+            padding-bottom: 10px; /* Space for the scrollbar if needed */
+        }
+        /* Array Item Sizing: Use flex-shrink to allow items to condense */
+        .array-item {
+            min-width: 3rem; /* Minimum width */
+            width: 5rem; height: 5rem; 
+            flex-shrink: 1; /* Allows the box to shrink */
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 1.5rem; 
+            border-radius: 0.5rem;
+            transition: transform 0.5s, background-color 0.5s;
+            background-color: #a78bfa; color: #3730a3;
+            padding: 0 5px; /* Added internal padding adjustment */
+        }
+        .array-item.checking { 
+            background-color: #fcd34d; 
+            transform: scale(1.15); 
+            box-shadow: 0 0 12px #fcd34d;
+        }
+        .array-item.found { 
+            background-color: #34d399; 
+            color: white; 
+            transform: scale(1.15); 
+        }
+
+        /* Binary Search Pointer Styles */
+        #targetValueBubble {
+            position: absolute; top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 4rem; height: 4rem; line-height: 4rem; 
+            background-color: #f97316; 
+            color: white; border-radius: 50%; font-weight: bold;
+            display: flex; 
+            align-items: center; justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 10;
+            font-size: 1.25rem; 
+        }
+        
+        #pointerContainer { 
+            height: 3rem; 
+            position: relative; 
+            width: 100%; 
+            margin-top: 0.5rem;
+        }
+
+        .pointer {
+            position: absolute; 
+            top: 0; 
+            font-size: 1rem; 
+            font-weight: bold; 
+            transition: transform 0.5s ease-out;
+            display: none; 
+            white-space: nowrap;
+        }
+        .low-pointer { color: #34d399; }
+        .mid-pointer { color: #fcd34d; }
+        .high-pointer { color: #ef4444; }
+
+        /* Status message appears below the pointer container */
+        .status-message {
+            margin-top: 2rem; 
+            font-size: 1.3rem; 
+            font-weight: 500; text-align: center; 
+            color: #d1d5db; padding: 1.5rem; border-radius: 0.5rem;
+            background-color: #374151; border: 1px solid #4b5563;
+        }
+        .theory, .steps { color: #d1d5db; text-align: justify; margin: 15px 0; font-size: 1.05rem; } 
+        .input-group { display: flex; flex-direction: column; gap: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div id="search-page" class="bg-gray-950 pt-20">
+        <div class="visualizer-container">
+            <h1 id="algoName" class="text-3xl font-bold text-center mb-6">Binary Search Visualizer</h1>
+            
+            <div id="algorithm-description" class="text-sm text-gray-400 text-justify mb-6">
+                <p class="theory">Binary Search is fast ($\text{O}(\log n)$) but requires the array to be **sorted**. (Input will be automatically sorted before execution.)</p>
+                <p class="steps">1. Set low to 0 and high to the last index.</p>
+                <p class="steps">2. Calculate mid as (low + high) / 2.</p>
+                <p class="steps">3. If $A[\text{mid}]$ is the target, search is complete.</p>
+                <p class="steps">4. If $A[\text{mid}]$ is less than the target, set low = mid + 1.</p>
+                <p class="steps">5. If $A[\text{mid}]$ is greater than the target, set high = mid - 1.</p>
+                <p class="steps">6. Repeat steps 2-5 until the target is found or low crosses high.</p>
+            </div>
+
+            <h2 class="text-2xl font-serif text-center mb-4">Visualization</h2>
+            
+            <div class="input-group">
+                <div>
+                    <label for="arrayInput">Array (comma-separated - will be sorted automatically):</label>
+                    <input type="text" id="arrayInput" placeholder="e.g., 10, 5, 1, 12, 16, 20" value="10, 5, 1, 12, 16, 20" />
+                </div>
+                <div>
+                    <label for="targetInput">Target Value:</label>
+                    <input type="number" id="targetInput" placeholder="e.g., 12" value="12" />
+                </div>
+                <button id="startButton" class="button">Start Binary Search</button>
+            </div>
+            
+            <div id="visualization" class="visualization-area">
+                <div id="arrayContainer" class="array-container"></div>
+                <div id="targetValueBubble"></div>
+                
+                <div id="pointerContainer">
+                    <div id="lowPointer" class="pointer low-pointer">low</div>
+                    <div id="midPointer" class="pointer mid-pointer">mid</div>
+                    <div id="highPointer" class="pointer high-pointer">high</div>
+                </div>
+
+                <div id="statusMessage" class="status-message">Awaiting search...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const currentAlgo = 'binary';
+        const defaultArray = '10, 5, 1, 12, 16, 20'; 
+        const defaultTarget = 12;
+
+        function parseArray(input) {
+            return input.split(',').map(item => Number(item.trim())).filter(item => !isNaN(item));
+        }
+
+        // --- Pointer/Position Logic (Fixed for alignment) ---
+        function getElementCenterPosition(index) {
+            const item = document.getElementById(`item-${index}`);
+            if (!item) return null;
+            
+            const itemRect = item.getBoundingClientRect();
+            const arrayContainerRect = document.getElementById('arrayContainer').getBoundingClientRect();
+            const itemCenterRelativeToContainer = itemRect.left + itemRect.width / 2 - arrayContainerRect.left; 
+            const pointerContainerRect = document.getElementById('pointerContainer').getBoundingClientRect();
+            const pointerPosition = itemCenterRelativeToContainer + (arrayContainerRect.left - pointerContainerRect.left);
+
+            return pointerPosition;
+        }
+
+        function movePointer(pointerId, index, offset) {
+            const pointer = document.getElementById(pointerId);
+            const center = getElementCenterPosition(index);
+            if (pointer && center !== null && index !== -1) {
+                const adjustedCenter = center + (offset || 0); 
+                pointer.style.display = 'block';
+                pointer.style.transform = `translateX(${adjustedCenter}px)`;
+            } else if (pointer) {
+                pointer.style.display = 'none'; 
+            }
+        }
+        // ---------------------------------------------
+
+        function renderArray(arr, target) {
+            const arrayContainer = document.getElementById('arrayContainer');
+            const targetBubble = document.getElementById('targetValueBubble');
+            arrayContainer.innerHTML = '';
+
+            targetBubble.textContent = target;
+            targetBubble.style.display = 'flex';
+            movePointer('lowPointer', -1); 
+            movePointer('midPointer', -1);
+            movePointer('highPointer', -1);
+            
+            // Render the array that was potentially sorted on the backend
+            arr.forEach((value, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('array-item');
+                itemDiv.id = `item-${index}`;
+                itemDiv.textContent = value;
+                arrayContainer.appendChild(itemDiv);
+            });
+        }
+
+        async function visualizeSteps(steps, initialArr) {
+            const statusMessage = document.getElementById('statusMessage');
+            
+            // Re-render the array with the *sorted* version from the backend's steps
+            // We assume the first step contains the final sorted array (or a property named 'array')
+            const sortedArr = steps[0]?.array || initialArr.slice().sort((a,b) => a-b);
+            renderArray(sortedArr, Number(document.getElementById('targetInput').value));
+            
+            const items = document.querySelectorAll('.array-item');
+
+            items.forEach(item => item.classList.remove('checking', 'found'));
+            
+            for (const step of steps) {
+                
+                // ... (Visualization logic remains the same for slow steps) ...
+                
+                // --- Step 1: Move Low and High Pointers ---
+                statusMessage.textContent = `Iteration in progress: Setting low (${step.low}) and high (${step.high}).`;
+                movePointer('lowPointer', step.low, -30);
+                movePointer('highPointer', step.high, 30);
+                movePointer('midPointer', -1); 
+
+                await new Promise(r => setTimeout(r, 1000)); 
+                
+                // --- Step 2: Calculate and Show Mid Pointer ---
+                const index = step.mid;
+                if (index !== -1) {
+                    movePointer('midPointer', index, 0);
+                    statusMessage.textContent = `Step 1/3: Mid found at index ${index}. Value is ${step.value}.`;
+                    await new Promise(r => setTimeout(r, 1000)); 
+                }
+                
+                // --- Step 3: Compare ---
+                items.forEach(item => item.classList.remove('checking'));
+                const currentItem = document.getElementById(`item-${index}`);
+
+                if (step.action === 'compare') {
+                    statusMessage.textContent = `Step 2/3: Comparing value ${step.value} with target ${step.target}...`;
+                    if (currentItem) currentItem.classList.add('checking');
+                    await new Promise(r => setTimeout(r, 1500)); 
+                } 
+                
+                // --- Step 4: Result/Next Action ---
+                if (step.action === 'found') {
+                    statusMessage.textContent = `SUCCESS! Found ${step.target} at index ${index}!`;
+                    if (currentItem) {
+                        currentItem.classList.remove('checking');
+                        currentItem.classList.add('found');
+                    }
+                    movePointer('lowPointer', -1);
+                    movePointer('highPointer', -1);
+                    movePointer('midPointer', -1); 
+                    return;
+                } else if (step.action === 'compare') {
+                    if (step.value < step.target) {
+                        statusMessage.textContent = `Step 3/3: ${step.value} is too low. Discarding left half. New search area starts at index ${index + 1}.`;
+                    } else {
+                        statusMessage.textContent = `Step 3/3: ${step.value} is too high. Discarding right half. New search area ends at index ${index - 1}.`;
+                    }
+                    await new Promise(r => setTimeout(r, 1500)); 
+                } else if (step.action === 'not_found') {
+                    statusMessage.textContent = "Target not found. Low crossed High, element is not in array.";
+                    movePointer('lowPointer', -1);
+                    movePointer('midPointer', -1);
+                    movePointer('highPointer', -1);
+                    break;
+                }
+            }
+        }
+
+        async function startSearch() {
+            const initialArr = parseArray(document.getElementById('arrayInput').value);
+            const target = Number(document.getElementById('targetInput').value);
+            
+            // Temporarily render the unsorted array with a loading message
+            renderArray(initialArr, target); 
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = `Sorting array and contacting backend for steps...`;
+            
+            try {
+                const response = await fetch('/run-algo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // The backend handles the sorting now
+                    body: JSON.stringify({ algo: 'binary', arr: initialArr, target: target }) 
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok || data.error) {
+                    statusMessage.textContent = `Error: ${data.error || response.statusText}. Check console for details.`;
+                } else {
+                    // Pass the original array in case the backend doesn't explicitly return the sorted array
+                    await visualizeSteps(data.steps, initialArr); 
+                }
+            } catch (err) {
+                statusMessage.textContent = `Connection Error: ${err.message}. Is your Flask server running?`;
+                console.error('Error:', err);
+            }
+        }
+
+        document.getElementById('startButton').onclick = startSearch;
+
+        window.onload = () => renderArray(parseArray(defaultArray), defaultTarget);
+    </script>
+</body>
+</html>

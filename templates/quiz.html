@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Quiz - DSA Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .animate-flip { transform-style: preserve-3d; transition: transform 0.6s; }
+        .is-flipped { transform: rotateY(180deg); }
+        .card-face { backface-visibility: hidden; }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-white font-poppins">
+
+    <nav class="bg-gray-900 bg-opacity-85 fixed top-0 w-full shadow-sm z-50">
+        <div class="container mx-auto flex flex-wrap items-center justify-between py-3 px-4">
+            <a class="font-bold text-white text-xl" href="index.html">
+                <img src="https://via.placeholder.com/60" alt="Logo" class="h-12 w-12 mr-2 inline-block"> DSA Studio
+            </a>
+            <div class="hidden md:flex space-x-4">
+                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="index.html">Home</a>
+                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="explore.html">Explore</a>
+                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="quiz.html">Quiz</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="min-h-screen pt-20">
+        <div class="text-center py-12 md:py-16 bg-blue-950">
+            <h1 class="text-white text-4xl md:text-5xl font-bold">DSA Quiz</h1>
+            <p class="text-gray-300 mt-2 text-lg">Choose a topic to start your quiz!</p>
+        </div>
+
+        <!-- Quiz selection -->
+        <div id="quiz-selection-area" class="container mx-auto px-4 py-8 flex flex-col items-center">
+            <h2 class="mb-5 text-3xl font-semibold text-white">Choose Quiz Algorithm</h2>
+            <select id="quiz-algo"
+                class="form-select w-full md:w-80 p-3 mb-6 bg-gray-800 text-white border border-gray-700 rounded-lg shadow-md focus:ring-2 focus:ring-cyan-500 transition-colors duration-200">
+                <option value="">--Select Algorithm--</option>
+                <option value="stack">Stack</option>
+                <option value="queue">Queue</option>
+                <option value="bst">BST</option>
+                <option value="bubble">Bubble Sort</option>
+                <option value="merge">Merge Sort</option>
+                <option value="quick">Quick Sort</option>
+                <option value="linear">Linear Search</option>
+                <option value="binary">Binary Search</option>
+                <option value="dfs">DFS</option>
+                <option value="bfs">BFS</option>
+            </select>
+            <button id="start-quiz-btn"
+                class="px-8 py-3 rounded-full text-white font-semibold bg-gradient-to-r from-cyan-500 to-blue-900 hover:from-cyan-600 hover:to-blue-950 shadow-lg transition-colors duration-300">Start Quiz</button>
+        </div>
+
+        <!-- Quiz cards -->
+        <div id="quiz-container" class="container mx-auto px-4 py-8 hidden flex-wrap justify-center gap-6 pb-24"></div>
+
+        <!-- Submit button -->
+        <button id="submit-quiz-btn"
+            class="hidden fixed bottom-6 right-6 px-8 py-4 rounded-full text-white font-bold bg-cyan-600 hover:bg-cyan-700 transition-colors duration-300 shadow-xl z-50">Submit Quiz</button>
+
+        <!-- Results -->
+        <div id="results-page" class="hidden text-center py-20 bg-gray-950">
+            <div class="container mx-auto px-4">
+                <div id="results-card" class="max-w-md mx-auto bg-blue-900 p-10 rounded-2xl shadow-2xl">
+                    <h1 class="text-4xl font-bold text-white mb-4">Quiz Results</h1>
+                    <p class="text-lg text-gray-200 mt-3">Your final score is:</p>
+                    <div id="score-display" class="text-7xl font-extrabold text-cyan-400 my-6">0/0</div>
+                    <button class="px-6 py-3 border border-white text-white rounded-full hover:bg-white hover:text-gray-800 transition-colors duration-300 text-lg"
+                        onclick="location.reload();">Take another quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizAlgoSelect = document.getElementById('quiz-algo');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const quizContainerDiv = document.getElementById('quiz-container');
+        const submitBtn = document.getElementById('submit-quiz-btn');
+        const quizSelectionArea = document.getElementById('quiz-selection-area');
+        const resultsPage = document.getElementById('results-page');
+
+        let quizData = {};
+        let currentQuizTopic = null;
+        const userAnswers = {};
+
+        // Start quiz
+        startQuizBtn.addEventListener('click', async () => {
+            const selectedTopic = quizAlgoSelect.value;
+            if (!selectedTopic) {
+                alert("Please select an algorithm to start the quiz!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/quiz-data?algorithm=${selectedTopic}`);
+                if (!response.ok) throw new Error("Failed to fetch quiz data");
+                const questions = await response.json();
+
+                if (!questions || questions.length === 0) {
+                    alert(`No questions found for ${selectedTopic}`);
+                    return;
+                }
+
+                quizData[selectedTopic] = questions;
+                loadQuiz(selectedTopic);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load quiz data from backend");
+            }
+        });
+
+        function loadQuiz(topic) {
+            currentQuizTopic = topic;
+            userAnswers[topic] = {};
+
+            const questions = quizData[topic];
+            quizContainerDiv.innerHTML = '';
+            quizSelectionArea.classList.add('hidden');
+            quizContainerDiv.classList.remove('hidden');
+            quizContainerDiv.classList.add('flex');
+            submitBtn.classList.remove('hidden');
+
+            questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'w-full sm:w-72 h-72 relative';
+                card.innerHTML = `
+                    <div class="w-full h-full relative perspective-[1000px] cursor-pointer animate-flip" onclick="this.classList.toggle('is-flipped')">
+                        <div class="w-full h-full absolute rounded-2xl shadow-lg border border-gray-700 bg-gradient-to-br from-blue-900 to-cyan-500 card-face flex items-center justify-center">
+                            <h5 class="text-xl font-bold">Question ${index + 1}</h5>
+                        </div>
+                        <div class="w-full h-full absolute rounded-2xl shadow-lg border border-gray-700 bg-gradient-to-br from-blue-950 to-blue-800 card-face"
+                             style="transform: rotateY(180deg); backface-visibility:hidden; padding:1.5rem;">
+                            <h5 class="text-lg font-semibold mb-3">${q.question}</h5>
+                            <div class="w-full mt-3 flex flex-col items-center space-y-2">
+                                ${q.options.map(opt => `<button class="w-full text-sm py-2 px-4 rounded-full bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 transition-colors" data-answer="${opt}" data-index="${index}">${opt}</button>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                quizContainerDiv.appendChild(card);
+
+                card.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        const selectedOption = e.target.dataset.answer;
+                        const questionIndex = e.target.dataset.index;
+
+                        if (userAnswers[currentQuizTopic][questionIndex] === undefined) {
+                            userAnswers[currentQuizTopic][questionIndex] = selectedOption;
+
+                            const parentCard = e.target.closest('div[onclick]');
+                            parentCard.querySelectorAll('button').forEach(b => b.disabled = true);
+
+                            const correctAnswer = quizData[currentQuizTopic][questionIndex].answer;
+                            if (selectedOption === correctAnswer) {
+                                e.target.classList.add('bg-green-600', 'hover:bg-green-600');
+                            } else {
+                                e.target.classList.add('bg-red-600', 'hover:bg-red-600');
+                                const correctBtn = Array.from(parentCard.querySelectorAll('button')).find(b => b.dataset.answer === correctAnswer);
+                                if (correctBtn) correctBtn.classList.add('bg-green-600', 'hover:bg-green-600');
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const questions = quizData[currentQuizTopic];
+            let score = 0;
+            questions.forEach((q, i) => {
+                if (userAnswers[currentQuizTopic][i] === q.answer) score++;
+            });
+
+            document.getElementById('score-display').textContent = `${score}/${questions.length}`;
+            quizContainerDiv.classList.add('hidden');
+            submitBtn.classList.add('hidden');
+            resultsPage.classList.remove('hidden');
+        });
+    </script>
+</body>
+
+</html>
