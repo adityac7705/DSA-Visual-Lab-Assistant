@@ -159,71 +159,76 @@
         </div>
 
         <div class="container mx-auto px-4 pb-5">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-        <!-- Searching -->
-        <div class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-900 text-white h-full">
-            <div class="text-center p-3">
-                <h5 class="text-lg">🔍 Searching</h5>
-                <p class="text-sm">Learn Linear Search, Binary Search and more.</p>
-                <a href="visualize.html?topic=linear-search"
-                    class="block bg-blue-950 text-white py-2 px-3 mt-2 hover:bg-blue-800">Linear Search</a>
-                <a href="visualize.html?topic=binary-search"
-                    class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Binary Search</a>
+                <!-- Searching -->
+                <div
+                    class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-900 text-white h-full">
+                    <div class="text-center p-3">
+                        <h5 class="text-lg">🔍 Searching</h5>
+                        <p class="text-sm">Learn Linear Search, Binary Search and more.</p>
+                        <a href="/visualize?topic=linear-search"
+                            class="block bg-blue-950 text-white py-2 px-3 mt-2 hover:bg-blue-800">Linear Search</a>
+                        <a href="/binary_search"
+                            class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Binary Search</a>
+
+                    </div>
+                </div>
+
+                <!-- Sorting -->
+                <div
+                    class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-800 text-white h-full">
+                    <div class="text-center p-3">
+                        <h5 class="text-lg">📊 Sorting</h5>
+                        <p class="text-sm">Explore Bubble, Merge, Quick Sort and others.</p>
+                        <a href="visualize.html?topic=bubble-sort"
+                            class="block bg-blue-950 text-white py-2 px-3 mt-2 hover:bg-blue-800">Bubble Sort</a>
+                        <a href="visualize.html?topic=merge-sort"
+                            class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Merge Sort</a>
+                        <a href="visualize.html?topic=quick-sort"
+                            class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Quick Sort</a>
+                        <a href="visualize.html?topic=heap-sort"
+                            class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Heap Sort</a>
+                    </div>
+                </div>
+
+                <!-- Stack & Queue -->
+                <div
+                    class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-700 text-white h-full flex flex-col items-center justify-center p-6">
+                    <h5 class="text-lg font-semibold mb-2">📦 Stack & Queue</h5>
+                    <p class="text-sm mb-4 text-center">Understand Push, Pop, Peek, Enqueue & Dequeue operations.</p>
+                    <div class="flex flex-col w-full gap-3">
+                        <a href="/stack"
+                            class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                            Stack
+                        </a>
+                        <a href="visualize.html?topic=queue"
+                            class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                            Queue
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Graphs -->
+                <div
+                    class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-700 text-white h-full flex flex-col items-center justify-center p-6">
+                    <h5 class="text-lg font-semibold mb-2">📈 Graphs</h5>
+                    <p class="text-sm mb-4 text-center">Learn BFS & DFS traversal algorithms.</p>
+                    <div class="flex flex-col w-full gap-3">
+                        <a href="visualize.html?topic=bfs"
+                            class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                            BFS
+                        </a>
+                        <a href="visualize.html?topic=dfs"
+                            class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
+                            DFS
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Add other boxes as needed -->
             </div>
         </div>
-
-        <!-- Sorting -->
-        <div class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-800 text-white h-full">
-            <div class="text-center p-3">
-                <h5 class="text-lg">📊 Sorting</h5>
-                <p class="text-sm">Explore Bubble, Merge, Quick Sort and others.</p>
-                <a href="visualize.html?topic=bubble-sort"
-                    class="block bg-blue-950 text-white py-2 px-3 mt-2 hover:bg-blue-800">Bubble Sort</a>
-                <a href="visualize.html?topic=merge-sort"
-                    class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Merge Sort</a>
-                <a href="visualize.html?topic=quick-sort"
-                    class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Quick Sort</a>
-                <a href="visualize.html?topic=heap-sort"
-                    class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Heap Sort</a>
-            </div>
-        </div>
-
-        <!-- Stack & Queue -->
-        <div class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-700 text-white h-full flex flex-col items-center justify-center p-6">
-            <h5 class="text-lg font-semibold mb-2">📦 Stack & Queue</h5>
-            <p class="text-sm mb-4 text-center">Understand Push, Pop, Peek, Enqueue & Dequeue operations.</p>
-            <div class="flex flex-col w-full gap-3">
-                <a href="visualize.html?topic=stack"
-                    class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
-                    Stack
-                </a>
-                <a href="visualize.html?topic=queue"
-                    class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
-                    Queue
-                </a>
-            </div>
-        </div>
-
-        <!-- Graphs -->
-        <div class="rounded-2xl shadow-md transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-700 text-white h-full flex flex-col items-center justify-center p-6">
-            <h5 class="text-lg font-semibold mb-2">📈 Graphs</h5>
-            <p class="text-sm mb-4 text-center">Learn BFS & DFS traversal algorithms.</p>
-            <div class="flex flex-col w-full gap-3">
-                <a href="visualize.html?topic=bfs"
-                    class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
-                    BFS
-                </a>
-                <a href="visualize.html?topic=dfs"
-                    class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
-                    DFS
-                </a>
-            </div>
-        </div>
-
-        <!-- Add other boxes as needed -->
-    </div>
-</div>
 
 
         <footer class="text-center py-4 bg-blue-950" id="contact-explore">

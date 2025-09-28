@@ -1,0 +1,134 @@
+ /* All CSS from both pages combined */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f0f1a;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .navbar .nav-link {
+            color: #fff !important;
+            margin-right: 15px;
+        }
+
+        .navbar .nav-link:hover {
+            color: #54ACBF !important;
+        }
+
+        .hero {
+            background: url('assets/background.png') no-repeat center center/cover;
+            height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            margin-top: 56px;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .typing-text {
+            font-size: 3rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid #fff;
+            width: 0;
+            margin: 0 auto;
+            animation: typing 4s steps(30, end) forwards, blink 0.7s infinite;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent
+            }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            color: #cfd8ff;
+        }
+
+        .start-btn {
+            margin-top: 20px;
+            background: linear-gradient(90deg, #54ACBF, #023859);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        .start-btn:hover {
+            background: linear-gradient(90deg, #26658C, #011C40);
+            color: white;
+        }
+
+        .card {
+            border-radius: 15px;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            h2 {
+                color: white;
+            }
+
+            footer {
+                background: #011C40;
+                color: #fff;
+            }
+        .header {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: #012345;
+        }
+
+        .list-group-item {
+            background: #011C40;
+            color: white;
+            border: none;
+        }
+
+        .list-group-item:hover {
+            background: #033E73;
+        }
+    
