@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Sort Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Using a Poppins-like font style and dark theme setup -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: #181825; 
+            font-family: 'Poppins', sans-serif; 
+        }
+        .visualizer-container { 
+            background: #232334; 
+            border-radius: 18px; 
+            padding: 40px; 
+            margin: 0 auto;
+            border: 2px solid #8b5cf6; /* Purple border */
+        }
+        .array-element {
+            /* Styles adopted from the queue theme but adapted for sort visualization */
+            min-width: 60px; 
+            height: 60px;
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 1.4rem; 
+            color: #ede9fe;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.5); /* Soft purple glow */
+            margin: 0 5px; 
+            background: rgba(49, 46, 129, 0.8); /* Dark indigo background */
+            border: 2px solid #6366f1; /* Indigo border */
+            
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            transition: all 0.3s cubic-bezier(.77,0,.18,1);
+        }
+        .highlight-compare {
+            /* Yellow/Amber for comparison */
+            background-color: rgba(251, 191, 36, 0.9); 
+            border: 2px solid #d97706; 
+            transform: scale(1.08) translateY(-5px);
+            box-shadow: 0 0 15px #fcd34d;
+            color: #1a202c;
+        }
+        .highlight-swap {
+            /* Red/Pink for swap */
+            background-color: rgba(236, 72, 153, 0.9); 
+            border: 2px solid #db2777;
+            transform: scale(1.15) translateY(-8px);
+            box-shadow: 0 0 20px #f472b6;
+        }
+        .highlight-sorted {
+            /* Teal/Green for sorted elements */
+            background-color: rgba(52, 211, 153, 0.8);
+            border: 2px solid #047857; 
+            box-shadow: 0 0 12px #34d399;
+        }
+        .control-button {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .control-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* Adding a style for severe errors to make them stand out */
+        .error-message {
+            border: 2px solid #ef4444; /* Red border */
+            background-color: #450a0a; /* Darker red background */
+            color: #fca5a5; /* Light red text */
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="p-8 text-white">
+
+    <div class="max-w-4xl mx-auto visualizer-container shadow-2xl">
+        <h1 class="text-4xl font-bold text-center text-purple-400 mb-4 border-b border-purple-700 pb-4">
+            Bubble Sort Visualization
+        </h1>
+
+        <!-- Theory Section - UPDATED -->
+        <div class="mb-8 p-6 bg-gray-900 rounded-xl border border-gray-700">
+            <!-- Heading font increased from text-2xl to text-3xl -->
+            <h2 class="text-3xl font-bold text-teal-400 mb-4">What is Bubble Sort?</h2>
+            <!-- Theory font increased from text-sm to text-base -->
+            <p class="text-gray-300 text-base mb-4">
+                **Bubble Sort** is a straightforward comparison-based sorting algorithm. It repeatedly steps through the list, compares adjacent elements, and **swaps** them if they are in the wrong order. This entire process, known as a **pass** or iteration, is repeated until the list is fully sorted, characterized by a pass completing without any swaps. The name comes from how the largest (or smallest) unsorted element "bubbles" up to its correct, final position at the end of each pass.
+            </p>
+            <p class="text-gray-300 text-base mb-4">
+                While easy to implement, Bubble Sort is highly inefficient for large datasets, with a worst-case and average-case time complexity of $O(n^2)$.
+            </p>
+
+            <h3 class="text-xl font-semibold text-purple-300 mb-2 mt-4">The Step-by-Step Process</h3>
+            <!-- Step font increased from text-sm to text-base -->
+            <ol class="list-decimal list-inside text-gray-300 text-base space-y-2 pl-4">
+                <li>**Comparison:** Starting from the first index, compare the current element with the element immediately following it.</li>
+                <li>**Swapping:** If the current element is greater than the next element, they are **swapped** to place the larger value toward the end of the array.</li>
+                <li>**Pass Completion:** The comparison and swapping continue for every adjacent pair until the end of the unsorted portion of the list is reached (one pass).</li>
+                <li>**Repetition:** The entire pass is repeated, but the last $N$ elements are excluded from comparison since they are already in their correct sorted positions. The algorithm stops when a pass results in zero swaps.</li>
+            </ol>
+        </div>
+        
+        <!-- Input and Control Panel -->
+        <div class="space-y-4 mb-8 p-6 bg-gray-900 rounded-xl border border-purple-700">
+            <label for="arrayInput" class="block text-lg font-medium text-purple-300">
+                Input Array (comma-separated numbers)
+            </label>
+            <input type="text" id="arrayInput" value="34, 3, 42, 47, 1, 7, 15, 36"
+                   class="w-full px-4 py-3 bg-gray-800 border border-purple-600 rounded-lg text-purple-200 placeholder-purple-400 focus:ring-purple-500 focus:border-purple-500">
+            
+            <button onclick="runVisualization()" id="runButton"
+                    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-xl transition duration-150 ease-in-out">
+                Run Bubble Sort
+            </button>
+        </div>
+
+        <!-- Visualization Area -->
+        <div id="visualizationArea" class="hidden">
+            <div class="text-purple-300 mb-6 text-xl font-semibold text-center" id="stepInfo"></div>
+            
+            <div class="flex flex-wrap justify-center gap-3 p-6 bg-gray-900 rounded-xl shadow-inner mb-8 border border-gray-700" id="arrayContainer">
+                <!-- Array elements will be rendered here -->
+            </div>
+
+            <!-- Step Navigation Controls -->
+            <div class="flex justify-between items-center space-x-4">
+                <button onclick="prevStep()" id="prevButton" disabled
+                        class="control-button px-6 py-3 bg-purple-900 hover:bg-purple-800 text-purple-300 font-bold rounded-xl border border-purple-700">
+                    &larr; Previous Step
+                </button>
+                
+                <div id="stepCounter" class="text-xl font-bold text-teal-400">
+                    Step 0 / 0
+                </div>
+
+                <button onclick="nextStep()" id="nextButton" disabled
+                        class="control-button px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-xl shadow-md">
+                    Next Step &rarr;
+                </button>
+            </div>
+        </div>
+
+        <!-- Error/Status Message -->
+        <div id="message" class="mt-6 text-center font-medium p-3 rounded-lg hidden"></div>
+
+    </div>
+
+    <script>
+        const ARRAY_CONTAINER = document.getElementById('arrayContainer');
+        const STEP_INFO = document.getElementById('stepInfo');
+        const STEP_COUNTER = document.getElementById('stepCounter');
+        const PREV_BUTTON = document.getElementById('prevButton');
+        const NEXT_BUTTON = document.getElementById('nextButton');
+        const MESSAGE = document.getElementById('message');
+        const VISUALIZATION_AREA = document.getElementById('visualizationArea');
+        const RUN_BUTTON = document.getElementById('runButton');
+        const ARRAY_INPUT = document.getElementById('arrayInput');
+        
+        // Global state
+        let steps = [];
+        let currentStepIndex = -1;
+        const API_URL = '/run-algo'; // Your Flask endpoint
+
+        // --- Core Functions ---
+
+        /**
+         * Utility to show/hide message box
+         * isError = true will apply the strong error styling (red box).
+         */
+        function showMessage(text, isError = false) {
+            MESSAGE.textContent = text;
+            MESSAGE.className = 'mt-6 text-center font-medium p-3 rounded-lg'; // Reset classes
+            
+            if (text) {
+                MESSAGE.classList.remove('hidden');
+                if (isError) {
+                    MESSAGE.classList.add('error-message');
+                } else {
+                    MESSAGE.classList.add('text-yellow-400', 'bg-yellow-900/20');
+                }
+            } else {
+                MESSAGE.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Fetches the steps from the Flask backend.
+         */
+        async function fetchSteps(array) {
+            showMessage('Fetching steps from server...', false);
+            RUN_BUTTON.disabled = true;
+
+            try {
+                // Implementing exponential backoff for robustness
+                const maxRetries = 3;
+                let lastError = null;
+                
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                algo: 'bubble', // Matches the endpoint logic in your app.py
+                                arr: array
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok || data.error) {
+                            // This is where the server's 500 status or returned error message is caught
+                            const errorMessage = data.error || response.statusText || 'Unknown server error.';
+                            throw new Error(errorMessage);
+                        }
+                        
+                        steps = data.steps;
+                        showMessage(''); // Clear message on success
+                        return true;
+
+                    } catch (error) {
+                        lastError = error;
+                        // Wait (1s, 2s, 4s) before retrying
+                        if (i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                        }
+                    }
+                }
+                throw lastError; // Throw error after max retries
+
+            } catch (error) {
+                console.error("Error running algorithm:", error);
+                // Display a clear error message in the UI
+                const userMessage = `Error: Failed to fetch steps. Check your backend server console for: "${error.message}" and ensure it's running.`;
+                showMessage(userMessage, true);
+                steps = [];
+                return false;
+            } finally {
+                RUN_BUTTON.disabled = false;
+            }
+        }
+        
+        /**
+         * Renders the current step's array visualization.
+         */
+        function renderStep() {
+            if (steps.length === 0 || currentStepIndex < 0) {
+                // State: Initial load or error state (uninitialized)
+                
+                // Use the input value to render the initial array, without any highlight
+                const rawInput = ARRAY_INPUT.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                
+                ARRAY_CONTAINER.innerHTML = rawInput.map(value => `
+                    <div class="array-element text-xl p-3">
+                        ${value}
+                    </div>
+                `).join('');
+
+                STEP_INFO.textContent = 'Enter an array and click "Run Bubble Sort" to visualize.';
+                STEP_COUNTER.textContent = 'Step 0 / 0';
+                
+                // Disable navigation buttons
+                PREV_BUTTON.disabled = true;
+                NEXT_BUTTON.disabled = true;
+                NEXT_BUTTON.textContent = 'Next Step →';
+                NEXT_BUTTON.classList.add('bg-teal-500', 'hover:bg-teal-600');
+                NEXT_BUTTON.classList.remove('bg-gray-700', 'text-gray-400');
+
+                return;
+            }
+
+            const step = steps[currentStepIndex];
+            const array = step.array;
+            const highlight = step.highlight || [];
+            const action = step.action;
+            
+            // --- Custom Logic to handle Step 0 (Initial State) ---
+            let infoText = '';
+            let currentHighlight = highlight;
+            
+            if (currentStepIndex === 0) {
+                // If it's the very first step fetched from the server, clear highlights
+                infoText = 'Initial State. Click "Next Step" to begin the comparison process.';
+                currentHighlight = []; // Force no highlighting on Step 0
+            } else if (action === 'compare' && highlight.length === 2) {
+                const [index1, index2] = highlight;
+                const [val1, val2] = [String(array[index1]), String(array[index2])]; 
+                infoText = `**COMPARE**: Checking if ${val1} > ${val2} (indices ${index1}, ${index2}).`;
+            } else if (action === 'swap' && highlight.length === 2) {
+                const [index1, index2] = highlight;
+                const [val1, val2] = [String(array[index1]), String(array[index2])];
+                infoText = `**SWAP**: ${val1} is greater than ${val2}. Swapping values at indices ${index1} and ${index2}.`;
+            } else if (action === 'done') {
+                infoText = 'Sorting complete! Array is fully sorted.';
+            } else if (action === 'start') {
+                // Fallback for an explicit 'start' action from backend, treated like a non-highlighted step
+                infoText = 'Initial State. Click "Next Step" to begin the comparison process.';
+                currentHighlight = [];
+            } else {
+                infoText = `Action: ${action.toUpperCase()}.`;
+            }
+            
+            STEP_INFO.textContent = infoText;
+
+            // Render the array elements
+            ARRAY_CONTAINER.innerHTML = array.map((value, index) => {
+                let actionClass = '';
+                
+                if (action !== 'done' && currentHighlight.includes(index)) {
+                    // Only apply compare/swap highlights if not in the 'done' state
+                    if (action === 'compare') {
+                        actionClass = 'highlight-compare';
+                    } else if (action === 'swap') {
+                        actionClass = 'highlight-swap';
+                    }
+                } else if (action === 'done') {
+                    // Apply sorted highlight only in the final step
+                    actionClass = 'highlight-sorted';
+                }
+                
+                return `
+                    <div class="array-element ${actionClass} text-xl p-3">
+                        ${value}
+                    </div>
+                `;
+            }).join('');
+
+            // Update controls and counter
+            const totalSteps = steps.length > 0 ? steps.length - 1 : 0; // Assuming step 0 is the start state
+            const displayStep = currentStepIndex;
+
+            STEP_COUNTER.textContent = `Step ${displayStep} / ${totalSteps}`;
+            PREV_BUTTON.disabled = currentStepIndex <= 0;
+            NEXT_BUTTON.disabled = currentStepIndex >= steps.length - 1;
+
+            if (currentStepIndex === steps.length - 1 && steps.length > 0) {
+                NEXT_BUTTON.textContent = 'Sorting Complete!';
+                NEXT_BUTTON.classList.remove('bg-teal-500', 'hover:bg-teal-600');
+                NEXT_BUTTON.classList.add('bg-gray-700', 'text-gray-400');
+            } else {
+                NEXT_BUTTON.textContent = 'Next Step →';
+                NEXT_BUTTON.classList.add('bg-teal-500', 'hover:bg-teal-600');
+                NEXT_BUTTON.classList.remove('bg-gray-700', 'text-gray-400');
+            }
+        }
+
+        /**
+         * Moves to the next step.
+         */
+        function nextStep() {
+            if (currentStepIndex < steps.length - 1) {
+                currentStepIndex++;
+                renderStep();
+            }
+        }
+
+        /**
+         * Moves to the previous step.
+         */
+        function prevStep() {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderStep();
+            }
+        }
+
+        /**
+         * Main function to start the visualization.
+         */
+        async function runVisualization() {
+            const inputElement = document.getElementById('arrayInput');
+            const rawInput = inputElement.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            
+            // Basic input validation
+            if (rawInput.length === 0) {
+                showMessage('Input array cannot be empty.', true);
+                VISUALIZATION_AREA.classList.add('hidden');
+                return;
+            }
+            
+            VISUALIZATION_AREA.classList.remove('hidden');
+
+            const success = await fetchSteps(rawInput);
+            
+            if (success && steps.length > 0) {
+                // Assuming the first step in the list is the initial state (Step 0)
+                currentStepIndex = 0; 
+                renderStep();
+            } else {
+                // If fetch failed, keep the visualization area visible to show the error
+                currentStepIndex = -1; 
+                renderStep(); // Renders the initial un-highlighted array and resets info text
+            }
+        }
+        
+        // Initialize visualization on load: 
+        // Display the initial array based on the input field value without starting the visualization logic.
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStep();
+        });
+    </script>
+</body>
+</html>

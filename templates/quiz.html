@@ -1,46 +1,89 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSA Quiz - DSA Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Ensuring no horizontal scrolling */
+        body { overflow-x: hidden; }
+        
         .font-poppins { font-family: 'Poppins', sans-serif; }
         .animate-flip { transform-style: preserve-3d; transition: transform 0.6s; }
         .is-flipped { transform: rotateY(180deg); }
         .card-face { backface-visibility: hidden; }
+        
+        /* Removed fixed height from .card-wrapper to allow content to dictate size */
+        .card-wrapper {
+            /* height will be determined by content (min-h-[16rem] set on card faces) */
+        }
+
+        /* NEW: Subtle background pattern for quiz cards */
+        .quiz-card-bg {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-card-bg::before {
+            content: '????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Make the question marks very subtle and dark */
+            font-size: 1.5rem;
+            line-height: 1.5rem;
+            color: rgba(255, 255, 255, 0.05); /* Very light, semi-transparent white */
+            pointer-events: none; /* Allows clicks on elements below */
+            word-break: break-all;
+            white-space: pre-wrap;
+            z-index: 0;
+            opacity: 0.8;
+            transform: rotate(-10deg) scale(2); /* Slight rotation and scale for pattern effect */
+            transform-origin: top left;
+        }
     </style>
 </head>
 
-<body class="bg-gray-950 text-white font-poppins">
+<!-- Updated body background to a deep, formal dark gray -->
+<body class="bg-gray-900 text-white font-poppins">
 
-    <nav class="bg-gray-900 bg-opacity-85 fixed top-0 w-full shadow-sm z-50">
+    <!-- Global Message Box (Replaces alert()) -->
+    <div id="global-message" class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-lg shadow-2xl bg-yellow-700 text-white font-semibold hidden transition-all duration-300">
+        <!-- Message content here -->
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-gray-900 bg-opacity-85 fixed top-0 w-full shadow-sm z-50 border-b border-cyan-800">
         <div class="container mx-auto flex flex-wrap items-center justify-between py-3 px-4">
-            <a class="font-bold text-white text-xl" href="index.html">
-                <img src="https://via.placeholder.com/60" alt="Logo" class="h-12 w-12 mr-2 inline-block"> DSA Studio
+            <a class="font-bold text-white text-xl flex items-center" href="/">
+                <!-- Using a standard placeholder image URL for robustness -->
+                <img src="https://placehold.co/48x48/1e293b/ffffff?text=DS" alt="Logo" class="h-12 w-12 mr-2 inline-block rounded-lg shadow-md"> DSA Studio
             </a>
-            <div class="hidden md:flex space-x-4">
-                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="index.html">Home</a>
-                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="explore.html">Explore</a>
-                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="quiz.html">Quiz</a>
+            <div class="hidden md:flex space-x-6">
+                <!-- UPDATED: Home link now points to the Flask root route / -->
+                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="/">Home</a>
+                <!-- UPDATED: Explore link now points to the expected Flask route /explore -->
+                <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="/explore">Explore</a>
+                <a class="text-cyan-400 font-bold border-b-2 border-cyan-400 transition-colors duration-300" href="/quiz">Quiz</a>
             </div>
         </div>
     </nav>
 
     <div class="min-h-screen pt-20">
-        <div class="text-center py-12 md:py-16 bg-blue-950">
-            <h1 class="text-white text-4xl md:text-5xl font-bold">DSA Quiz</h1>
-            <p class="text-gray-300 mt-2 text-lg">Choose a topic to start your quiz!</p>
+        <!-- Hero Section - Updated background to a fun yet formal gradient -->
+        <div class="text-center py-12 md:py-16 bg-gradient-to-r from-gray-900 to-indigo-950 border-b border-cyan-700">
+            <h1 class="text-white text-4xl md:text-6xl font-extrabold tracking-tight">DSA Quiz</h1>
+            <p class="text-gray-300 mt-2 text-xl">Choose a topic to start your quiz!</p>
         </div>
 
         <!-- Quiz selection -->
-        <div id="quiz-selection-area" class="container mx-auto px-4 py-8 flex flex-col items-center">
-            <h2 class="mb-5 text-3xl font-semibold text-white">Choose Quiz Algorithm</h2>
+        <div id="quiz-selection-area" class="container mx-auto px-4 py-12 flex flex-col items-center">
+            <h2 class="mb-8 text-3xl font-bold text-cyan-400">Choose Quiz Algorithm</h2>
             <select id="quiz-algo"
-                class="form-select w-full md:w-80 p-3 mb-6 bg-gray-800 text-white border border-gray-700 rounded-lg shadow-md focus:ring-2 focus:ring-cyan-500 transition-colors duration-200">
+                class="form-select w-full md:w-96 p-4 mb-8 bg-gray-800 text-white border border-cyan-700 rounded-xl shadow-lg focus:ring-4 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 text-lg">
                 <option value="">--Select Algorithm--</option>
                 <option value="stack">Stack</option>
                 <option value="queue">Queue</option>
@@ -54,24 +97,31 @@
                 <option value="bfs">BFS</option>
             </select>
             <button id="start-quiz-btn"
-                class="px-8 py-3 rounded-full text-white font-semibold bg-gradient-to-r from-cyan-500 to-blue-900 hover:from-cyan-600 hover:to-blue-950 shadow-lg transition-colors duration-300">Start Quiz</button>
+                class="px-10 py-4 rounded-full text-white font-extrabold bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-700 hover:to-blue-800 shadow-2xl transition-all duration-300 transform hover:scale-[1.03]">
+                Start Quiz
+            </button>
         </div>
 
-        <!-- Quiz cards -->
-        <div id="quiz-container" class="container mx-auto px-4 py-8 hidden flex-wrap justify-center gap-6 pb-24"></div>
+        <!-- Quiz cards - Updated to use responsive grid for better alignment -->
+        <div id="quiz-container" 
+             class="container mx-auto px-4 py-8 hidden 
+                    grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
+                    gap-6 pb-24">
+            <!-- Quiz cards will be inserted here -->
+        </div>
 
         <!-- Submit button -->
         <button id="submit-quiz-btn"
             class="hidden fixed bottom-6 right-6 px-8 py-4 rounded-full text-white font-bold bg-cyan-600 hover:bg-cyan-700 transition-colors duration-300 shadow-xl z-50">Submit Quiz</button>
 
         <!-- Results -->
-        <div id="results-page" class="hidden text-center py-20 bg-gray-950">
+        <div id="results-page" class="hidden text-center py-20 bg-gray-900">
             <div class="container mx-auto px-4">
-                <div id="results-card" class="max-w-md mx-auto bg-blue-900 p-10 rounded-2xl shadow-2xl">
-                    <h1 class="text-4xl font-bold text-white mb-4">Quiz Results</h1>
-                    <p class="text-lg text-gray-200 mt-3">Your final score is:</p>
-                    <div id="score-display" class="text-7xl font-extrabold text-cyan-400 my-6">0/0</div>
-                    <button class="px-6 py-3 border border-white text-white rounded-full hover:bg-white hover:text-gray-800 transition-colors duration-300 text-lg"
+                <div id="results-card" class="max-w-md mx-auto bg-blue-900 p-10 rounded-2xl shadow-2xl border border-cyan-600">
+                    <h1 class="text-5xl font-extrabold text-white mb-4">Quiz Results</h1>
+                    <p class="text-xl text-gray-200 mt-3">Your final score is:</p>
+                    <div id="score-display" class="text-8xl font-extrabold text-cyan-400 my-8 animate-bounce">0/0</div>
+                    <button class="px-8 py-3 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-200 transition-colors duration-300 text-lg shadow-md"
                         onclick="location.reload();">Take another quiz</button>
                 </div>
             </div>
@@ -85,34 +135,85 @@
         const submitBtn = document.getElementById('submit-quiz-btn');
         const quizSelectionArea = document.getElementById('quiz-selection-area');
         const resultsPage = document.getElementById('results-page');
+        const globalMessage = document.getElementById('global-message');
 
         let quizData = {};
         let currentQuizTopic = null;
         const userAnswers = {};
+        const MAX_QUESTIONS = 5; // Define the maximum number of questions per quiz
+
+        /**
+         * Custom message utility to replace alert().
+         */
+        function showMessage(text, isError = false) {
+            globalMessage.textContent = text;
+            globalMessage.classList.remove('hidden', 'bg-red-700', 'bg-yellow-700');
+            
+            if (isError) {
+                globalMessage.classList.add('bg-red-700');
+            } else {
+                globalMessage.classList.add('bg-yellow-700');
+            }
+            
+            setTimeout(() => {
+                globalMessage.classList.add('hidden');
+            }, 3000);
+        }
+
+        /**
+         * Shuffles an array in place (Fisher-Yates algorithm).
+         * @param {Array} array The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
         // Start quiz
         startQuizBtn.addEventListener('click', async () => {
             const selectedTopic = quizAlgoSelect.value;
             if (!selectedTopic) {
-                alert("Please select an algorithm to start the quiz!");
+                showMessage("Please select an algorithm to start the quiz!");
                 return;
             }
 
             try {
+                // Fetching all quiz data from the Flask backend endpoint /quiz-data
                 const response = await fetch(`/quiz-data?algorithm=${selectedTopic}`);
-                if (!response.ok) throw new Error("Failed to fetch quiz data");
-                const questions = await response.json();
-
-                if (!questions || questions.length === 0) {
-                    alert(`No questions found for ${selectedTopic}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                let allQuestions = await response.json();
+                
+                if (allQuestions.length === 0) {
+                    showMessage(`No questions found for ${selectedTopic}. Please check your quiz_questions.json file.`);
                     return;
                 }
+                
+                // 1. Shuffle the entire list of questions
+                shuffleArray(allQuestions);
+                
+                // 2. Select the first MAX_QUESTIONS (5) questions
+                const selectedQuestions = allQuestions.slice(0, MAX_QUESTIONS);
 
-                quizData[selectedTopic] = questions;
+                if (selectedQuestions.length < MAX_QUESTIONS) {
+                    showMessage(`Warning: Only ${selectedQuestions.length} questions available for this topic.`, false);
+                }
+
+                // Store the selected subset of questions
+                quizData[selectedTopic] = selectedQuestions;
+
                 loadQuiz(selectedTopic);
             } catch (err) {
-                console.error(err);
-                alert("Failed to load quiz data from backend");
+                console.error("Quiz data fetch error:", err);
+                // This message suggests a network or server issue
+                showMessage("Failed to load quiz data. Ensure the backend is running and quiz questions exist.", true);
             }
         });
 
@@ -124,22 +225,33 @@
             quizContainerDiv.innerHTML = '';
             quizSelectionArea.classList.add('hidden');
             quizContainerDiv.classList.remove('hidden');
-            quizContainerDiv.classList.add('flex');
+            // 'flex' class removed, replaced by grid classes in HTML
             submitBtn.classList.remove('hidden');
 
             questions.forEach((q, index) => {
                 const card = document.createElement('div');
-                card.className = 'w-full sm:w-72 h-72 relative';
+                // Use w-full for fluid grid sizing. Removed height constraint.
+                card.className = 'w-full relative card-wrapper'; 
+                
+                // Shuffle the options before rendering them
+                const shuffledOptions = shuffleArray([...q.options]);
+
                 card.innerHTML = `
-                    <div class="w-full h-full relative perspective-[1000px] cursor-pointer animate-flip" onclick="this.classList.toggle('is-flipped')">
-                        <div class="w-full h-full absolute rounded-2xl shadow-lg border border-gray-700 bg-gradient-to-br from-blue-900 to-cyan-500 card-face flex items-center justify-center">
-                            <h5 class="text-xl font-bold">Question ${index + 1}</h5>
+                    <div class="w-full relative perspective-[1000px] cursor-pointer animate-flip" data-question-index="${index}" onclick="this.classList.toggle('is-flipped')">
+                        <!-- Card Front -->
+                        <!-- ADDED quiz-card-bg class and simplified title -->
+                        <div class="w-full absolute rounded-2xl shadow-lg border border-gray-700 bg-gradient-to-br from-blue-900 to-cyan-500 card-face flex items-center justify-center p-4 min-h-[16rem] quiz-card-bg">
+                            <h5 class="text-3xl font-bold text-center z-10">Question ${index + 1}</h5>
                         </div>
-                        <div class="w-full h-full absolute rounded-2xl shadow-lg border border-gray-700 bg-gradient-to-br from-blue-950 to-blue-800 card-face"
-                             style="transform: rotateY(180deg); backface-visibility:hidden; padding:1.5rem;">
-                            <h5 class="text-lg font-semibold mb-3">${q.question}</h5>
-                            <div class="w-full mt-3 flex flex-col items-center space-y-2">
-                                ${q.options.map(opt => `<button class="w-full text-sm py-2 px-4 rounded-full bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 transition-colors" data-answer="${opt}" data-index="${index}">${opt}</button>`).join('')}
+                        
+                        <!-- Card Back - ADDED quiz-card-bg class -->
+                        <div class="w-full absolute rounded-2xl shadow-lg border border-gray-700 bg-gradient-to-br from-blue-950 to-blue-800 card-face 
+                            min-h-[16rem] quiz-card-bg"
+                            style="transform: rotateY(180deg); padding:1.5rem;">
+                            <h5 class="text-lg font-semibold mb-4">${q.question}</h5>
+                            <!-- Added max-w-full and text-wrap for options in case they are long -->
+                            <div class="w-full mt-3 flex flex-col items-center space-y-3">
+                                ${shuffledOptions.map(opt => `<button class="w-full text-base py-2 px-4 rounded-full bg-gray-800 text-white border border-gray-700 hover:bg-cyan-700 transition-colors max-w-full text-wrap" data-answer="${opt}" data-index="${index}">${opt}</button>`).join('')}
                             </div>
                         </div>
                     </div>
@@ -148,24 +260,47 @@
 
                 card.querySelectorAll('button').forEach(btn => {
                     btn.addEventListener('click', e => {
-                        e.stopPropagation();
+                        // REMOVED: e.stopPropagation(); to allow the card flip to happen after processing the answer
+                        
                         const selectedOption = e.target.dataset.answer;
                         const questionIndex = e.target.dataset.index;
-
-                        if (userAnswers[currentQuizTopic][questionIndex] === undefined) {
-                            userAnswers[currentQuizTopic][questionIndex] = selectedOption;
-
-                            const parentCard = e.target.closest('div[onclick]');
-                            parentCard.querySelectorAll('button').forEach(b => b.disabled = true);
-
-                            const correctAnswer = quizData[currentQuizTopic][questionIndex].answer;
-                            if (selectedOption === correctAnswer) {
-                                e.target.classList.add('bg-green-600', 'hover:bg-green-600');
-                            } else {
-                                e.target.classList.add('bg-red-600', 'hover:bg-red-600');
-                                const correctBtn = Array.from(parentCard.querySelectorAll('button')).find(b => b.dataset.answer === correctAnswer);
-                                if (correctBtn) correctBtn.classList.add('bg-green-600', 'hover:bg-green-600');
+                        const cardWrapper = e.target.closest('.card-wrapper');
+                        
+                        // Find the flippable element (the immediate parent with the onclick handler)
+                        const parentCard = e.target.closest('div[data-question-index]');
+                        
+                        // Check if question has already been answered
+                        if (userAnswers[currentQuizTopic][questionIndex] !== undefined) {
+                            // If already answered, just ensure it's flipped to show the result
+                            if (!parentCard.classList.contains('is-flipped')) {
+                                parentCard.classList.add('is-flipped');
                             }
+                            return; 
+                        }
+
+                        userAnswers[currentQuizTopic][questionIndex] = selectedOption;
+
+                        // Disable all buttons in this question once answered
+                        parentCard.querySelectorAll('button').forEach(b => b.disabled = true);
+
+                        const correctAnswer = quizData[currentQuizTopic][questionIndex].answer;
+                        
+                        // Highlight the selected answer
+                        e.target.classList.remove('bg-gray-800', 'hover:bg-cyan-700');
+                        e.target.classList.add(selectedOption === correctAnswer ? 'bg-green-600' : 'bg-red-600');
+                        
+                        // If wrong, highlight the correct answer
+                        if (selectedOption !== correctAnswer) {
+                            const correctBtn = Array.from(parentCard.querySelectorAll('button')).find(b => b.dataset.answer === correctAnswer);
+                            if (correctBtn) {
+                                correctBtn.classList.remove('bg-gray-800');
+                                correctBtn.classList.add('bg-green-600');
+                            }
+                        }
+                        
+                        // NEW: Programmatically flip the card after the answer is registered and highlighted
+                        if (parentCard && !parentCard.classList.contains('is-flipped')) {
+                            parentCard.classList.add('is-flipped');
                         }
                     });
                 });
@@ -183,30 +318,12 @@
             quizContainerDiv.classList.add('hidden');
             submitBtn.classList.add('hidden');
             resultsPage.classList.remove('hidden');
+            
+            // Scroll to the top to show results page clearly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+        
+        // --- Mock Data REMOVED: Questions are now fetched from the /quiz-data endpoint ---
     </script>
 </body>
-
 </html>
-=======
-{% extends "base.html" %}
-{% block content %}
-<h2 class="mb-3">Choose Quiz Algorithm</h2>
-<select id="quiz-algo" class="form-select mb-3" style="max-width:350px;">
-    <option value="">--Select Algorithm--</option>
-    <option value="stack">Stack</option>
-    <option value="queue">Queue</option>
-    <option value="bst">BST</option>
-    <option value="bubble">Bubble Sort</option>
-    <option value="merge">Merge Sort</option>
-    <option value="quick">Quick Sort</option>
-    <option value="linear">Linear Search</option>
-    <option value="binary">Binary Search</option>
-    <option value="dfs">DFS</option>
-    <option value="bfs">BFS</option>
-</select>
-<button onclick="loadQuiz()" class="btn btn-primary mb-3">Start Quiz</button>
-<div id="quiz-area"></div>
-<script src="/static/js/quiz.js"></script>
-{% endblock %}
->>>>>>> 69af825f961c9fd8abb92dfe4ee35a6e3f1d9c01

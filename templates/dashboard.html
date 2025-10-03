@@ -43,8 +43,12 @@
 
     <nav class="bg-gray-900 bg-opacity-85 fixed top-0 w-full shadow-sm z-50">
         <div class="container mx-auto flex flex-wrap items-center justify-between py-3 px-4">
-            <a class="font-bold text-white text-xl" href="#home-page">
-                <img src="https://via.placeholder.com/60" alt="Logo" class="h-12 w-12 mr-2 inline-block"> DSA Studio
+            <a class="font-bold text-white text-xl" href="#" onclick="showPage('home-page')">
+                <!-- Using an SVG icon instead of a placeholder image for better styling -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2 inline-block text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2m-6 12v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 11h10a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1v-2a1 1 0 011-1z" />
+                </svg>
+                DSA Studio
             </a>
             <div class="hidden md:flex space-x-4" id="navbarContent">
                 <a class="text-white hover:text-cyan-400 transition-colors duration-300" href="#"
@@ -73,65 +77,63 @@
                 </a>
             </div>
         </section>
-
-        <section class="py-5" id="applications">
+<section class="py-5" id="applications">
             <div class="container mx-auto px-4">
-                <h2 class="text-center mb-5 font-bold text-white">Real-Life Applications of DSA</h2>
+                <h2 class="text-center mb-5 text-3xl font-bold text-cyan-400">Real-Life Applications of DSA</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-900 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/fluency/48/map.png" class="mx-auto block mt-2" alt="Maps">
-                        <h5 class="mt-3">Maps & Navigation</h5>
+                        <h5 class="mt-3 font-semibold">Maps & Navigation</h5>
                         <p class="text-sm">Graphs & shortest path algorithms power Google Maps route finding.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-800 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/fluency/48/google-logo.png" class="mx-auto block mt-2"
                             alt="Search">
-                        <h5 class="mt-3">Search Engines</h5>
+                        <h5 class="mt-3 font-semibold">Search Engines</h5>
                         <p class="text-sm">Efficient search algorithms help deliver accurate results instantly.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-cyan-400 text-black text-center p-3 h-full">
                         <img src="https://img.icons8.com/fluency/48/facebook-new.png" class="mx-auto block mt-2"
                             alt="Social">
-                        <h5 class="mt-3">Social Media</h5>
+                        <h5 class="mt-3 font-semibold">Social Media</h5>
                         <p class="text-sm">Graphs represent friendships, followers & connections in networks.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-blue-950 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/fluency/48/shopping-cart.png" class="mx-auto block mt-2"
                             alt="E-Commerce">
-                        <h5 class="mt-3">E-Commerce</h5>
+                        <h5 class="mt-3 font-semibold">E-Commerce</h5>
                         <p class="text-sm">Recommendation engines use hashing, graphs & sorting for products.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-gradient-to-r from-purple-700 to-blue-600 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/color/96/server.png" class="mx-auto" alt="OS">
-                        <h5 class="mt-3">Operating Systems</h5>
+                        <h5 class="mt-3 font-semibold">Operating Systems</h5>
                         <p class="text-sm">Scheduling algorithms manage CPU & processes.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-gradient-to-r from-blue-600 to-purple-700 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/color/96/artificial-intelligence.png" class="mx-auto" alt="AI">
-                        <h5 class="mt-3">Artificial Intelligence</h5>
+                        <h5 class="mt-3 font-semibold">Artificial Intelligence</h5>
                         <p class="text-sm">Search & DP help in AI planning & ML models.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-gradient-to-r from-pink-500 to-purple-700 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/color/96/database.png" class="mx-auto" alt="Database">
-                        <h5 class="mt-3">Databases</h5>
+                        <h5 class="mt-3 font-semibold">Databases</h5>
                         <p class="text-sm">Trees & hashing power indexing & query optimization.</p>
                     </div>
                     <div
                         class="rounded-2xl border-none transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl bg-gradient-to-r from-blue-600 to-pink-500 text-white text-center p-3 h-full">
                         <img src="https://img.icons8.com/color/96/robot-2.png" class="mx-auto" alt="Robotics">
-                        <h5 class="mt-3">Robotics</h5>
+                        <h5 class="mt-3 font-semibold">Robotics</h5>
                         <p class="text-sm">Pathfinding guides robots in navigation & obstacles.</p>
                     </div>
                 </div>
             </div>
-        </section>
 
         <footer class="text-center py-4 bg-blue-950" id="contact">
             <div class="container mx-auto px-4">
@@ -181,9 +183,9 @@
                     <div class="text-center p-3">
                         <h5 class="text-lg">📊 Sorting</h5>
                         <p class="text-sm">Explore Bubble, Merge, Quick Sort and others.</p>
-                        <a href="visualize.html?topic=bubble-sort"
+                        <a href="/bubble_sort"
                             class="block bg-blue-950 text-white py-2 px-3 mt-2 hover:bg-blue-800">Bubble Sort</a>
-                        <a href="visualize.html?topic=merge-sort"
+                        <a href="/merge_sort"
                             class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Merge Sort</a>
                         <a href="visualize.html?topic=quick-sort"
                             class="block bg-blue-950 text-white py-2 px-3 mt-1 hover:bg-blue-800">Quick Sort</a>
@@ -202,10 +204,11 @@
                             class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
                             Stack
                         </a>
-                        <a href="visualize.html?topic=queue"
+                        <a href="/queue"
                             class="w-full text-center bg-blue-950 hover:bg-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300">
                             Queue
                         </a>
+
                     </div>
                 </div>
 

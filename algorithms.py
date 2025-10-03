@@ -1,29 +1,120 @@
 # algorithms.py
 
 # ------------------ Sorting ------------------
-def bubble_sort_steps(arr):
-    arr = arr[:]
-    steps = []
-    n = len(arr)
-    for i in range(n):
-        for j in range(n - i - 1):
-            steps.append({"array": list(arr), "highlight": [j, j+1], "action": "compare"})
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
-                steps.append({"array": list(arr), "highlight": [j, j+1], "action": "swap"})
-    steps.append({"array": list(arr), "highlight": [], "action": "done"})
-    return arr, steps
+import json
+from flask import Flask, jsonify, request
 
+app = Flask(__name__)
+
+def bubble_sort_steps(arr):
+    """
+    Performs Bubble Sort and records the steps.
+    Returns: (final_array, steps_list)
+    """
+    # Defensive copy and type conversion
+    try:
+        arr = [int(x) for x in arr]
+    except (ValueError, TypeError):
+        error_steps = [{"array": arr, "highlight": [], "action": "error", "message": "Non-numeric input detected."}]
+        return [], error_steps
+        
+    current_arr = arr[:]
+    steps = []
+    n = len(current_arr)
+
+    for i in range(n):
+        swapped = False
+        for j in range(n - i - 1):
+            # 1. Record comparison
+            steps.append({"array": list(current_arr), "highlight": [j, j+1], "action": "compare"})
+            
+            if current_arr[j] > current_arr[j+1]:
+                # 2. Perform swap
+                current_arr[j], current_arr[j+1] = current_arr[j+1], current_arr[j]
+                swapped = True
+                # 3. Record swap
+                steps.append({"array": list(current_arr), "highlight": [j, j+1], "action": "swap"})
+        
+        if not swapped:
+            break
+            
+    # Final state
+    steps.append({"array": list(current_arr), "highlight": [], "action": "done"})
+    
+    # CRITICAL FIX: Return two values to match '_, steps = ...' in app.py
+    return current_arr, steps
+
+
+# algorithms.py (Modified merge_sort_steps function)
 
 def merge_sort_steps(arr):
+    # A list of all steps/snapshots for the visualization
     steps = []
+    
+    # Global state container for the tree
+    # This list of lists will hold the sub-arrays at each level and will be updated during merging.
+    global_tree_state = []
 
-    def merge_sort(a):
-        if len(a) <= 1:
-            return a
-        mid = len(a)//2
-        left = merge_sort(a[:mid])
-        right = merge_sort(a[mid:])
+    # ------------------ Helper Functions ------------------
+    
+    def build_initial_tree(a, branches, level=0):
+        """
+        Builds the static initial structure for the visualization (the 'Split' phase).
+        """
+        # Ensure the branches list has an entry for the current level
+        while len(branches) < level + 1:
+            branches.append([])
+        
+        # Store the current sub-array
+        branches[level].append(a[:])
+        
+        if len(a) > 1:
+            mid = len(a) // 2
+            build_initial_tree(a[:mid], branches, level + 1)
+            build_initial_tree(a[mid:], branches, level + 1)
+        
+    def snapshot(info, active=None, done=None):
+        """
+        Captures a deep-copy of the current global_tree_state for a step.
+        """
+        snap = []
+        for lvl in global_tree_state:
+            snap.append([sub[:] for sub in lvl])
+        return {
+            "tree": snap,
+            "active": active or [],
+            "done": done or [],
+            "info": info
+        }
+        
+    def do_sort_recursive(a, base_level=0, base_idx=0):
+        """
+        The main recursive function that performs sorting and generates steps.
+        It updates the global_tree_state in place when a merge is complete.
+        """
+        n = len(a)
+        if n <= 1:
+            return a[:]
+
+        mid = n // 2
+        
+        # Recursive calls
+        left = do_sort_recursive(a[:mid], base_level + 1, base_idx * 2)
+        right = do_sort_recursive(a[mid:], base_level + 1, base_idx * 2 + 1)
+        
+        # --- Merging Starts (Conquer & Combine Phase) ---
+        
+        child1 = {"level": base_level + 1, "idx": base_idx * 2}
+        child2 = {"level": base_level + 1, "idx": base_idx * 2 + 1}
+        parent = {"level": base_level, "idx": base_idx}
+
+        # Step: Highlight the two sub-lists that are about to be merged
+        steps.append(snapshot(
+            info=f"Merging sub-lists: {left} and {right}",
+            active=[child1, child2]
+        ))
+        
+        # Perform the actual merge (standard merge sort logic)
         merged = []
         i = j = 0
         while i < len(left) and j < len(right):
@@ -33,11 +124,37 @@ def merge_sort_steps(arr):
             else:
                 merged.append(right[j])
                 j += 1
-            steps.append({"array": merged + left[i:] + right[j:], "action": "merge"})
-        merged += left[i:] + right[j:]
-        return merged
+        merged.extend(left[i:])
+        merged.extend(right[j:])
 
-    merge_sort(arr[:])
+        # Step: Update the parent node in the global state with the merged result
+        global_tree_state[base_level][base_idx] = merged
+        
+        # Step: Show the sorted result, marking the children as 'done' (merged)
+        steps.append(snapshot(
+            info=f"Merged and sorted result: {merged}",
+            done=[child1, child2, parent] # Mark children as merged, and parent as the newly sorted list
+        ))
+        
+        return merged
+    
+    # ------------------ Execution Start ------------------
+    
+    # 1. Initialize the global state by splitting the array completely
+    build_initial_tree(arr[:], global_tree_state)
+    
+    # Step 1: Show the complete split tree (Matches the Divide phase in the image)
+    steps.append(snapshot(info="Steps 1-2: Split array into sub-lists recursively down to individual elements/pairs."))
+
+    # Step 2: Call the recursive function to start the merging process
+    do_sort_recursive(arr[:])
+    
+    # Step 3: Final step showing the completed list
+    steps.append(snapshot(info="Merge Sort Complete. Full list is sorted.", done=[{"level": 0, "idx": 0}]))
+    
+    return steps
+
+    do_sort(arr[:])
     return steps
 
 
@@ -153,16 +270,60 @@ def stack_steps(ops):
 # ------------------ Queue ------------------
 def queue_steps(ops):
     queue = []
-    steps = []
+    steps = [{
+        "queue": [],
+        "action": "empty queue",
+        "value": None,
+        "rawOp": "Start"
+    }]
+
     for op in ops:
+        if not isinstance(op, str) or not op.strip():
+            steps.append({
+                "queue": list(queue),
+                "action": "noop",
+                "value": None,
+                "rawOp": str(op) + " (Unknown Op)"
+            })
+            continue
+
         parts = op.strip().split()
-        if parts[0].lower() == "enqueue" and len(parts) > 1:
-            val = parts[1]
+        action = parts[0].lower()
+        op_text = op.strip()
+
+        if action == "enqueue" and len(parts) > 1:
+            val = ' '.join(parts[1:])
             queue.append(val)
-            steps.append({"queue": list(queue), "action": "enqueue", "value": val})
-        elif parts[0].lower() == "dequeue":
-            val = queue.pop(0) if queue else None
-            steps.append({"queue": list(queue), "action": "dequeue", "value": val})
+            steps.append({
+                "queue": list(queue),
+                "action": "enqueue",
+                "value": val,
+                "rawOp": op_text
+            })
+        elif action == "dequeue":
+            if queue:
+                val = queue.pop(0)
+                steps.append({
+                    "queue": list(queue),
+                    "action": "dequeue",
+                    "value": val,
+                    "rawOp": op_text
+                })
+            else:
+                steps.append({
+                    "queue": list(queue),
+                    "action": "dequeue (error)",
+                    "value": None,
+                    "rawOp": op_text + " (Queue Empty)"
+                })
+        else:
+            steps.append({
+                "queue": list(queue),
+                "action": "noop",
+                "value": None,
+                "rawOp": op_text + " (Unknown Op)"
+            })
+
     return steps
 
 

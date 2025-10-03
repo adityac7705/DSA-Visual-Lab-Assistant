@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Merge Sort Tree Visualizer</title>
+  <style>
+    body { font-family: sans-serif; background: #fafafd; padding: 20px; }
+    #controls { margin-bottom: 20px; }
+    #tree { position: relative; min-height: 400px; }
+    .level { display: flex; justify-content: center; margin: 28px 0; position: relative; }
+    .node {
+      background: #8a70d6; color: #fff; margin: 0 10px;
+      padding: 10px 18px; border-radius: 7px; font-weight: bold; font-size: 18px;
+      min-width: 36px; text-align: center; transition: background 0.3s;
+      position: relative; z-index: 2;
+      white-space: nowrap;
+    }
+    .node.active { background: #007fff; }
+    .node.done { background: #26c90f; }
+    #svg-arrows { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+    #step-info { margin: 14px 0; font-weight: bold; color: #6a43b7; }
+    button { margin: 0 8px; padding: 6px 12px; }
+    input { font-size: 16px; padding: 6px; width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>Merge Sort Tree Visualizer</h1>
+  <div id="controls">
+    <input id="inputArray" value="7,3,2,16,24,4,11,9" />
+    <button id="startBtn">Visualize</button>
+    <button id="prevBtn" disabled>Prev</button>
+    <button id="nextBtn" disabled>Next</button>
+    <span id="stepCount"></span>
+  </div>
+  <div id="step-info"></div>
+  <div id="tree">
+    <svg id="svg-arrows"></svg>
+  </div>
+
+  <script>
+    let steps = [], current = 0;
+
+    function drawArrows() {
+      const svg = document.getElementById('svg-arrows');
+      svg.innerHTML = '';
+      const levels = [...document.querySelectorAll('.level')];
+      if (levels.length < 2) return;
+      for (let i = 0; i < levels.length - 1; ++i) {
+        const parents = levels[i].children;
+        const kids = levels[i + 1].children;
+        for (let pi = 0; pi < parents.length; ++pi) {
+          let target = [2 * pi, 2 * pi + 1];
+          let y1 = parents[pi].offsetTop + parents[pi].offsetHeight;
+          let x1 = parents[pi].offsetLeft + parents[pi].offsetWidth / 2;
+          for (const k of target) if (kids[k]) {
+            let x2 = kids[k].offsetLeft + kids[k].offsetWidth / 2;
+            let y2 = kids[k].offsetTop;
+            let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', `M${x1},${y1} Q${x1},${(y1 + y2)/2} ${x2},${y2}`);
+            path.setAttribute('stroke', '#888');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke-width', '2');
+            svg.appendChild(path);
+          }
+        }
+      }
+    }
+
+    function drawTree(step) {
+      const treeDiv = document.getElementById('tree');
+      treeDiv.innerHTML = '<svg id="svg-arrows"></svg>';
+      if (!step || !step.tree) return;
+      step.tree.forEach((level, i) => {
+        let div = document.createElement('div');
+        div.className = 'level';
+        level.forEach((nodeArr, idx) => {
+          let node = document.createElement('div');
+          node.className = 'node';
+          node.textContent = nodeArr.join(' ');
+          if ((step.active || []).some(a => a.level === i && a.idx === idx)) node.classList.add('active');
+          if ((step.done || []).some(a => a.level === i && a.idx === idx)) node.classList.add('done');
+          div.appendChild(node);
+        });
+        treeDiv.appendChild(div);
+      });
+      document.getElementById('step-info').textContent = step.info || '';
+      document.getElementById('stepCount').textContent = steps.length ? `Step ${current + 1} / ${steps.length}` : '';
+      setTimeout(drawArrows, 60);
+    }
+
+    document.getElementById('startBtn').onclick = async () => {
+      let input = document.getElementById('inputArray').value;
+      let arr = input.split(',').map(x => Number(x.trim())).filter(x => !isNaN(x));
+      if (arr.length === 0) {
+        alert('Enter a valid array of numbers.');
+        return;
+      }
+      document.getElementById('step-info').textContent = 'Loading...';
+      try {
+        let response = await fetch('http://localhost:5000/api/merge-sort-tree-steps', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ arr })
+        });
+        if (!response.ok) throw new Error('Server error: ' + response.statusText);
+        let data = await response.json();
+        steps = data.steps;
+        current = 0;
+        drawTree(steps[current]);
+        document.getElementById('prevBtn').disabled = false;
+        document.getElementById('nextBtn').disabled = false;
+      } catch (error) {
+        alert('Error: ' + error.message);
+        document.getElementById('step-info').textContent = '';
+      }
+    };
+
+    document.getElementById('prevBtn').onclick = () => {
+      if (current > 0) {
+        current--;
+        drawTree(steps[current]);
+      }
+    };
+
+    document.getElementById('nextBtn').onclick = () => {
+      if (current < steps.length - 1) {
+        current++;
+        drawTree(steps[current]);
+      }
+    };
+  </script>
+</body>
+</html>
