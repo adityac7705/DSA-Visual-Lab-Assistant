@@ -1,133 +1,633 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Merge Sort Tree Visualizer</title>
-  <style>
-    body { font-family: sans-serif; background: #fafafd; padding: 20px; }
-    #controls { margin-bottom: 20px; }
-    #tree { position: relative; min-height: 400px; }
-    .level { display: flex; justify-content: center; margin: 28px 0; position: relative; }
-    .node {
-      background: #8a70d6; color: #fff; margin: 0 10px;
-      padding: 10px 18px; border-radius: 7px; font-weight: bold; font-size: 18px;
-      min-width: 36px; text-align: center; transition: background 0.3s;
-      position: relative; z-index: 2;
-      white-space: nowrap;
-    }
-    .node.active { background: #007fff; }
-    .node.done { background: #26c90f; }
-    #svg-arrows { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-    #step-info { margin: 14px 0; font-weight: bold; color: #6a43b7; }
-    button { margin: 0 8px; padding: 6px 12px; }
-    input { font-size: 16px; padding: 6px; width: 300px; }
-  </style>
-</head>
-<body>
-  <h1>Merge Sort Tree Visualizer</h1>
-  <div id="controls">
-    <input id="inputArray" value="7,3,2,16,24,4,11,9" />
-    <button id="startBtn">Visualize</button>
-    <button id="prevBtn" disabled>Prev</button>
-    <button id="nextBtn" disabled>Next</button>
-    <span id="stepCount"></span>
-  </div>
-  <div id="step-info"></div>
-  <div id="tree">
-    <svg id="svg-arrows"></svg>
-  </div>
-
-  <script>
-    let steps = [], current = 0;
-
-    function drawArrows() {
-      const svg = document.getElementById('svg-arrows');
-      svg.innerHTML = '';
-      const levels = [...document.querySelectorAll('.level')];
-      if (levels.length < 2) return;
-      for (let i = 0; i < levels.length - 1; ++i) {
-        const parents = levels[i].children;
-        const kids = levels[i + 1].children;
-        for (let pi = 0; pi < parents.length; ++pi) {
-          let target = [2 * pi, 2 * pi + 1];
-          let y1 = parents[pi].offsetTop + parents[pi].offsetHeight;
-          let x1 = parents[pi].offsetLeft + parents[pi].offsetWidth / 2;
-          for (const k of target) if (kids[k]) {
-            let x2 = kids[k].offsetLeft + kids[k].offsetWidth / 2;
-            let y2 = kids[k].offsetTop;
-            let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', `M${x1},${y1} Q${x1},${(y1 + y2)/2} ${x2},${y2}`);
-            path.setAttribute('stroke', '#888');
-            path.setAttribute('fill', 'none');
-            path.setAttribute('stroke-width', '2');
-            svg.appendChild(path);
-          }
+    <meta charset="utf-8" />
+    <title>Merge Sort Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Dark Theme Colors from Bubble Sort Theme */
+        :root {
+            --bg: #181825;
+            /* Dark Background */
+            --card: #232334;
+            /* Darker Card Background */
+            --muted: #a1a1aa;
+            /* Gray-400 */
+            --accent: #8b5cf6;
+            /* Purple-500 (Primary accent) */
+            --done: #34d399;
+            /* Teal-400 (Sorted/Done accent) */
+            --compare: #fcd34d;
+            /* Amber-300 (Active/Compare) */
+            --text-main: #ede9fe;
+            /* Purple-100 */
+            --text-sub: #d1d5db;
+            /* Gray-300 */
         }
-      }
-    }
 
-    function drawTree(step) {
-      const treeDiv = document.getElementById('tree');
-      treeDiv.innerHTML = '<svg id="svg-arrows"></svg>';
-      if (!step || !step.tree) return;
-      step.tree.forEach((level, i) => {
-        let div = document.createElement('div');
-        div.className = 'level';
-        level.forEach((nodeArr, idx) => {
-          let node = document.createElement('div');
-          node.className = 'node';
-          node.textContent = nodeArr.join(' ');
-          if ((step.active || []).some(a => a.level === i && a.idx === idx)) node.classList.add('active');
-          if ((step.done || []).some(a => a.level === i && a.idx === idx)) node.classList.add('done');
-          div.appendChild(node);
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            margin: 0 auto 30px auto;
+            color: var(--accent) !important;
+            font-size: 5rem !important;
+            font-weight: 800 !important;
+            padding-bottom: 14px;
+            text-align: center;
+            display: block;
+        }
+
+
+        #theory {
+            margin-bottom: 25px;
+            padding: 25px;
+            background: #1f2937;
+            /* slightly darker than card */
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            /* same purple as visual box */
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            /* soft purple glow like visual box */
+        }
+
+
+        #theory h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--done);
+            /* Teal accent */
+            margin-bottom: 12px;
+        }
+
+        #theory p,
+        #theory li {
+            color: var(--text-sub);
+            font-size: 1rem;
+        }
+
+        #theory ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        #controls {
+            margin: 20px 0 25px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 8px;
+            background: #f8f8f8;
+            /* Gray-700 */
+            border: 1px solid #4b5563;
+            /* Gray-600 */
+            color: #000000;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        input[type="text"] {
+            width: 600px;
+            max-width: 90vw;
+        }
+
+        button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        button#startBtn {
+            background: var(--accent);
+            color: white;
+            padding: 10px
+        }
+
+        button#startBtn:hover {
+            background: #7c3aed;
+            /* Purple-600 hover */
+        }
+
+        button.secondary {
+            background: #374151;
+            /* Gray-700 */
+            color: var(--text-sub);
+            padding: 10px;
+        }
+
+        button.secondary:hover {
+            background: #4b5563;
+            /* Gray-600 hover */
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        label {
+            color: var(--muted);
+            margin-left: 10px;
+            font-size: 15px;
+        }
+
+        #visual {
+            position: relative;
+            background: var(--card);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            /* Soft purple glow */
+            min-height: 500px;
+            overflow: auto;
+            border: 2px solid var(--accent);
+        }
+
+        #svg-arrows {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #treeRoot {
+            position: relative;
+            z-index: 2;
+            padding: 15px 10px;
+        }
+
+        .level {
+            display: flex;
+            justify-content: center;
+            /* This margin defines the vertical spacing between levels */
+            gap: 20px;
+            margin: 70px 0;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .node {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(49, 46, 129, 0.8);
+            /* Dark indigo */
+            border: 2px solid #6366f1;
+            /* Indigo border */
+            border-radius: 10px;
+            padding: 12px 18px;
+            min-width: 60px;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+            /* Soft purple glow */
+            transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s;
+            white-space: nowrap;
+            position: relative;
+            font-size: 1.1rem;
+        }
+
+        .node.small {
+            min-width: 50px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        .node.active {
+            transform: translateY(-8px) scale(1.05);
+            background: rgba(251, 191, 36, 0.9);
+            /* Highlight-compare: Amber */
+            border-color: #d97706;
+            /* Darker Amber */
+            color: #1a202c;
+            box-shadow: 0 0 15px #fcd34d;
+        }
+
+        .node.done {
+            background: rgba(52, 211, 153, 0.8);
+            /* Highlight-sorted: Teal */
+            border-color: #047857;
+            /* Dark Teal */
+            color: #064e3b;
+            /* Dark Green text for contrast */
+            transform: none;
+            box-shadow: 0 0 12px var(--done);
+        }
+
+        .node .values {
+            display: inline-block;
+        }
+
+        #info {
+            margin-top: 10px;
+            color: var(--done);
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 8px 0;
+        }
+
+        #bottomControls {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #stepCounter {
+            color: lab(44.95% 69.7 -74.75);
+            /* Purple-600 */
+            font-weight: 700;
+            font-size: 1.1rem;
+            /* Add space below counter */
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 760px) {
+            input[type="text"] {
+                width: 100%;
+            }
+
+            .level {
+                gap: 8px;
+                margin: 50px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Merge Sort</h1>
+
+    <div id="theory">
+        <h2>What is Merge Sort?</h2>
+        <p>
+            <strong>Merge Sort</strong> is a classic divide-and-conquer sorting algorithm. It works by recursively
+            dividing an
+            unsorted array into two halves until each subarray contains only a single element, which is inherently
+            sorted.
+            After the division, the algorithm merges these smaller arrays step by step to produce new sorted subarrays,
+            gradually combining them until the entire array is sorted. The key idea is that merging two sorted arrays is
+            efficient and ensures the overall array remains sorted. This approach makes Merge Sort stable, meaning it
+            preserves the relative order of equal elements, which can be important in certain applications.
+        </p><br>
+        <p>The algorithm has a consistent time complexity of <strong>O(nlogn)</strong> for best, average, and worst
+            cases, making it highly
+            efficient for large datasets compared to simpler algorithms like Bubble Sort. Its space complexity is O(n)
+            due to
+            the auxiliary arrays used during merging. Merge Sort is widely used in applications where stability and
+            predictable
+            performance are important. Despite requiring extra memory, its predictable efficiency and simplicity of
+            concept make
+            it a foundational algorithm in computer science and a standard choice for sorting large datasets.</p>
+        <br>
+        <h2>Steps to solve Merge Sort</h2>
+        <p>
+        <ul>
+            <li>Step 1: Check if the array has one or zero elements — if yes, it’s already sorted.</li>
+            <li>Step 2: Find the middle index of the array.</li>
+            <li>Step 3: Split the array into two halves: left and right.</li>
+            <li>Step 4: Recursively apply merge sort to the left half.</li>
+            <li>Step 5: Recursively apply merge sort to the right half.</li>
+            <li>Step 6: Merge the two sorted halves by comparing elements and arranging them in order.</li>
+            <li>Step 7: Return the fully merged and sorted array.</li>
+        </ul>
+        </p>
+    </div>
+
+    <div id="controls">
+        <input id="arrayInput" placeholder="Enter numbers e.g. 2,6,8,2,3,9,1,4,9" />
+        <button id="startBtn">Start Visualization</button>
+        <button id="prevBtn" class="secondary" disabled>Prev</button>
+        <button id="playPauseBtn" class="secondary" disabled>Play</button>
+        <button id="nextBtn" class="secondary" disabled>Next</button>
+    </div>
+
+    <div id="visual">
+        <svg id="svg-arrows" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="treeRoot"></div>
+        <div id="info">Press <strong>Start Visualization</strong>. Splits will show arrows. Merge steps animate elements
+            into parent node.</div>
+        <div id="bottomControls">
+            <div id="stepCounter"></div>
+        </div>
+    </div>
+
+    <script>
+        let steps = [], current = 0, timer = null;
+        const treeRoot = document.getElementById('treeRoot');
+        const svg = document.getElementById('svg-arrows');
+        const info = document.getElementById('info');
+        const DEFAULT_DELAY_MS = 900;
+
+        const ACCENT_COLOR = '#8b5cf6';
+        // Increased offset to push the arrow start/end points further from the node edge
+        const ARROW_OFFSET_Y = 15;
+
+        function clearArrows() {
+            svg.innerHTML = '';
+        }
+
+        function drawArrow(parentNode, childNode, color = ACCENT_COLOR, width = 2, dashed = false) {
+            const svg = document.getElementById('svg-arrows');
+
+            const parentRect = parentNode.getBoundingClientRect();
+            const childRect = childNode.getBoundingClientRect();
+            const rootRect = svg.getBoundingClientRect();
+
+            // Start at bottom center of parent
+            const x1 = parentRect.left + parentRect.width / 2 - rootRect.left + svg.scrollLeft;
+            const y1 = parentRect.bottom - rootRect.top + svg.scrollTop;
+
+            // End at top center of child
+            const x2 = childRect.left + childRect.width / 2 - rootRect.left + svg.scrollLeft;
+            const y2 = childRect.top - rootRect.top + svg.scrollTop;
+
+            // Draw straight line
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', width);
+            if (dashed) line.setAttribute('stroke-dasharray', '6 6');
+            svg.appendChild(line);
+
+            // Arrowhead at the top of child box
+            const arrowHead = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            const headSize = 8;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const hx1 = x2 - headSize * Math.cos(angle - Math.PI / 6);
+            const hy1 = y2 - headSize * Math.sin(angle - Math.PI / 6);
+            const hx2 = x2 - headSize * Math.cos(angle + Math.PI / 6);
+            const hy2 = y2 - headSize * Math.sin(angle + Math.PI / 6);
+            arrowHead.setAttribute('points', `${x2},${y2} ${hx1},${hy1} ${hx2},${hy2}`);
+            arrowHead.setAttribute('fill', color);
+            svg.appendChild(arrowHead);
+        }
+
+        function drawLevelArrows() {
+            const svg = document.getElementById('svg-arrows');
+            svg.innerHTML = ''; // clear existing arrows
+
+            const levels = [...document.querySelectorAll('.level')];
+            if (levels.length < 2) return; // no arrows if only one level
+
+            const treeRootRect = document.getElementById('treeRoot').getBoundingClientRect();
+
+            for (let lvl = 0; lvl < levels.length - 1; lvl++) {
+                const parents = [...levels[lvl].children];
+                const children = [...levels[lvl + 1].children];
+
+                for (let pIdx = 0; pIdx < parents.length; pIdx++) {
+                    const parent = parents[pIdx];
+
+                    // Calculate indices of children (binary tree assumption)
+                    const leftChildIdx = pIdx * 2;
+                    const rightChildIdx = pIdx * 2 + 1;
+
+                    const leftChild = children.find(c => parseInt(c.dataset.idx) === leftChildIdx);
+                    const rightChild = children.find(c => parseInt(c.dataset.idx) === rightChildIdx);
+
+                    // Draw arrow only if child exists
+                    if (leftChild) drawArrow(parent, leftChild, ACCENT_COLOR);
+                    if (rightChild) drawArrow(parent, rightChild, ACCENT_COLOR);
+                }
+            }
+        }
+
+        function buildTreeDOM(step) {
+            treeRoot.innerHTML = '';
+            clearArrows();
+            if (!step || !step.tree) return;
+            const activeSet = new Set((step.active || []).map(a => `${a.level}|${a.idx}`));
+            const doneSet = new Set((step.done || []).map(a => `${a.level}|${a.idx}`));
+
+            step.tree.forEach((levelArr, lvl) => {
+                const levelDiv = document.createElement('div');
+                levelDiv.className = 'level';
+                levelArr.forEach((nodeArr, idx) => {
+                    if (nodeArr === undefined) return;
+
+                    const node = document.createElement('div');
+                    node.className = 'node' + (nodeArr.length <= 2 ? ' small' : '');
+                    node.dataset.level = lvl;
+                    node.dataset.idx = idx;
+                    const values = document.createElement('span');
+                    values.className = 'values';
+                    values.textContent = '[' + (nodeArr.length ? nodeArr.join(',') : '') + ']';
+                    node.appendChild(values);
+                    if (activeSet.has(`${lvl}|${idx}`)) node.classList.add('active');
+                    if (doneSet.has(`${lvl}|${idx}`)) node.classList.add('done');
+                    levelDiv.appendChild(node);
+                });
+                if (levelDiv.children.length > 0) {
+                    treeRoot.appendChild(levelDiv);
+                }
+            });
+            // Delay drawing arrows to ensure DOM has settled and bounding boxes are correct
+            setTimeout(drawLevelArrows, 40);
+        }
+
+        // The rest of the functions (animateMerge, renderStep, controls, etc.) remain the same
+        function animateMerge(step, callback) {
+            const done = step.done || [];
+            if (!done.length) {
+                callback();
+                return;
+            }
+            const parent = done.reduce((p, c) => (!p || c.level < p.level ? c : p), null);
+            if (!parent) {
+                buildTreeDOM(step);
+                callback();
+                return;
+            }
+            const lvl = parent.level,
+                idx = parent.idx;
+            const parentNode = document.querySelector(`.node[data-level='${lvl}'][data-idx='${idx}']`);
+            if (!parentNode) {
+                buildTreeDOM(step);
+                callback();
+                return;
+            }
+            const mergedArr = (step.tree && step.tree[lvl] && step.tree[lvl][idx]) ? step.tree[lvl][idx].slice() : [];
+            const leftNode = document.querySelector(`.node[data-level='${lvl + 1}'][data-idx='${idx * 2}']`);
+            const rightNode = document.querySelector(`.node[data-level='${lvl + 1}'][data-idx='${idx * 2 + 1}']`);
+            parentNode.classList.remove('done');
+            parentNode.classList.add('active');
+            const valuesSpan = parentNode.querySelector('.values') || null;
+            if (valuesSpan) valuesSpan.textContent = '[ ]';
+            if (leftNode) leftNode.classList.add('active');
+            if (rightNode) rightNode.classList.add('active');
+
+            let k = 0;
+            const delayElem = Math.max(80, DEFAULT_DELAY_MS / 3);
+
+            function tick() {
+                if (k >= mergedArr.length) {
+                    if (leftNode) leftNode.classList.remove('active');
+                    if (rightNode) rightNode.classList.remove('active');
+                    parentNode.classList.remove('active');
+                    parentNode.classList.add('done');
+                    if (valuesSpan) valuesSpan.textContent = '[' + mergedArr.join(',') + ']';
+                    callback();
+                    return;
+                }
+                const partial = mergedArr.slice(0, k + 1);
+                if (valuesSpan) valuesSpan.textContent = '[' + partial.join(',') + (k + 1 < mergedArr.length ? ', ...' : '') + ']';
+                k++;
+                setTimeout(tick, delayElem);
+            }
+            setTimeout(tick, Math.max(120, delayElem));
+        }
+
+        function renderStep(index, autoNext = false) {
+            if (!steps || index < 0 || index >= steps.length) return;
+            current = index;
+            const step = steps[current];
+
+            info.textContent = step.info || `Step ${current + 1}: Array state update.`;
+
+            const isMerge = /merge/i.test(step.info) && /merged/i.test(step.info) || (step.info && /Merged into/i.test(step.info)) || (step.done && step.done.some(d => d.level < (step.tree ? step.tree.length - 1 : 999)));
+
+            if (!isMerge) {
+                buildTreeDOM(step);
+                updateControls();
+                if (autoNext) scheduleAutoNext();
+                return;
+            }
+            buildTreeDOM(step);
+            setTimeout(() => {
+                animateMerge(step, () => {
+                    updateControls();
+                    if (autoNext) scheduleAutoNext();
+                });
+            }, 140);
+        }
+
+        function scheduleAutoNext() {
+            const delay = DEFAULT_DELAY_MS;
+            if (timer) return;
+            timer = setTimeout(() => {
+                if (current < steps.length - 1) renderStep(current + 1, true);
+                else pauseAuto();
+            }, delay);
+        }
+
+        function playAuto() {
+            if (timer) return;
+            document.getElementById('playPauseBtn').textContent = 'Pause';
+            renderStep(current, true);
+        }
+
+        function pauseAuto() {
+            if (timer) {
+                clearTimeout(timer);
+                timer = null;
+            }
+            document.getElementById('playPauseBtn').textContent = 'Play';
+        }
+
+        function updateControls() {
+            document.getElementById('prevBtn').disabled = (current === 0);
+            document.getElementById('nextBtn').disabled = (current >= steps.length - 1);
+            document.getElementById('playPauseBtn').disabled = steps.length <= 1;
+            document.getElementById('stepCounter').textContent = steps.length ? `Step ${current + 1} / ${steps.length}` : '';
+        }
+
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            pauseAuto();
+            const raw = document.getElementById('arrayInput').value;
+            const arr = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+            if (!arr.length) {
+                alert('Enter valid comma-separated numbers');
+                return;
+            }
+            info.textContent = 'Generating steps... (NOTE: Requires a running server to function)';
+            try {
+                const resp = await fetch('/run-algo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        algo: 'merge',
+                        arr: arr
+                    })
+                });
+                const data = await resp.json();
+                if (data.error) {
+                    info.textContent = 'Error: ' + data.error;
+                    return;
+                }
+                steps = data.steps || [];
+                if (!steps.length) {
+                    info.textContent = 'No steps returned';
+                    return;
+                }
+                current = 0;
+                renderStep(0, false);
+                updateControls();
+            } catch (err) {
+                info.textContent = 'Request failed: ' + err + '. This is expected if running without a backend server.';
+            }
         });
-        treeDiv.appendChild(div);
-      });
-      document.getElementById('step-info').textContent = step.info || '';
-      document.getElementById('stepCount').textContent = steps.length ? `Step ${current + 1} / ${steps.length}` : '';
-      setTimeout(drawArrows, 60);
-    }
 
-    document.getElementById('startBtn').onclick = async () => {
-      let input = document.getElementById('inputArray').value;
-      let arr = input.split(',').map(x => Number(x.trim())).filter(x => !isNaN(x));
-      if (arr.length === 0) {
-        alert('Enter a valid array of numbers.');
-        return;
-      }
-      document.getElementById('step-info').textContent = 'Loading...';
-      try {
-        let response = await fetch('http://localhost:5000/api/merge-sort-tree-steps', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ arr })
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            pauseAuto();
+            if (current > 0) renderStep(current - 1, false);
         });
-        if (!response.ok) throw new Error('Server error: ' + response.statusText);
-        let data = await response.json();
-        steps = data.steps;
-        current = 0;
-        drawTree(steps[current]);
-        document.getElementById('prevBtn').disabled = false;
-        document.getElementById('nextBtn').disabled = false;
-      } catch (error) {
-        alert('Error: ' + error.message);
-        document.getElementById('step-info').textContent = '';
-      }
-    };
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            pauseAuto();
+            if (current < steps.length - 1) renderStep(current + 1, false);
+        });
+        document.getElementById('playPauseBtn').addEventListener('click', () => {
+            if (timer) {
+                pauseAuto();
+            } else {
+                playAuto();
+            }
+        });
 
-    document.getElementById('prevBtn').onclick = () => {
-      if (current > 0) {
-        current--;
-        drawTree(steps[current]);
-      }
-    };
+        window.addEventListener('resize', () => {
+            setTimeout(drawLevelArrows, 80);
+        });
+        window.addEventListener('scroll', () => {
+            setTimeout(drawLevelArrows, 60);
+        });
+        document.getElementById('arrayInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('startBtn').click();
+            }
+        });
 
-    document.getElementById('nextBtn').onclick = () => {
-      if (current < steps.length - 1) {
-        current++;
-        drawTree(steps[current]);
-      }
-    };
-  </script>
+        // Initial control setup
+        document.addEventListener('DOMContentLoaded', updateControls);
+    </script>
 </body>
+
 </html>
