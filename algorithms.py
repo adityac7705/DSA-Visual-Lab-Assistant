@@ -6,6 +6,14 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
+# ✅ Define helper at very top
+def _convert_input(arr):
+    """Ensure arr is a list of integers."""
+    if isinstance(arr, str):
+        arr = [int(x) for x in arr.split(",") if x.strip().isdigit()]
+    return [int(x) for x in arr]
+
+
 def bubble_sort_steps(arr):
     """
     Performs Bubble Sort and records the steps.
@@ -47,143 +55,183 @@ def bubble_sort_steps(arr):
 
 # algorithms.py (Modified merge_sort_steps function)
 
+# algorithms.py
 def merge_sort_steps(arr):
-    # A list of all steps/snapshots for the visualization
+    """
+    Build a visual tree and emit step snapshots for split and merge phases.
+    Each snapshot contains:
+      - tree: list of levels, each level is a list of arrays (list of ints)
+      - active: list of {"level": int, "idx": int} currently being processed
+      - done: list of {"level": int, "idx": int} already finished/merged
+      - info: short textual description
+    """
+    # defensive copy / convert
+    try:
+        arr = [int(x) for x in arr]
+    except Exception:
+        arr = list(arr)
+
     steps = []
-    
-    # Global state container for the tree
-    # This list of lists will hold the sub-arrays at each level and will be updated during merging.
+    # global tree state: list of levels; each level is list of nodes (each node is a list)
     global_tree_state = []
 
-    # ------------------ Helper Functions ------------------
-    
-    def build_initial_tree(a, branches, level=0):
+    # Build initial static split tree structure
+    def build_initial_tree(a, level=0, idx=0):
         """
-        Builds the static initial structure for the visualization (the 'Split' phase).
+        Ensure global_tree_state has levels and nodes placeholders.
+        We'll append actual arrays at build-time to represent the split phase.
+        Returns nothing; fills global_tree_state[level][idx] = subarray
         """
-        # Ensure the branches list has an entry for the current level
-        while len(branches) < level + 1:
-            branches.append([])
-        
-        # Store the current sub-array
-        branches[level].append(a[:])
-        
+        # ensure level exists
+        while len(global_tree_state) <= level:
+            global_tree_state.append([])
+
+        # ensure place for idx (fill with None placeholders until idx exists)
+        while len(global_tree_state[level]) <= idx:
+            global_tree_state[level].append([])  # placeholder
+
+        # store the current subarray
+        global_tree_state[level][idx] = a[:]
+
         if len(a) > 1:
             mid = len(a) // 2
-            build_initial_tree(a[:mid], branches, level + 1)
-            build_initial_tree(a[mid:], branches, level + 1)
-        
-    def snapshot(info, active=None, done=None):
-        """
-        Captures a deep-copy of the current global_tree_state for a step.
-        """
-        snap = []
-        for lvl in global_tree_state:
-            snap.append([sub[:] for sub in lvl])
+            build_initial_tree(a[:mid], level + 1, idx * 2)
+            build_initial_tree(a[mid:], level + 1, idx * 2 + 1)
+
+    def snapshot(info="", active=None, done=None):
+        # deep copy of global tree (list of lists)
+        tree_copy = [[node[:] for node in level] for level in global_tree_state]
         return {
-            "tree": snap,
+            "tree": tree_copy,
             "active": active or [],
             "done": done or [],
-            "info": info
+            "info": info or ""
         }
-        
-    def do_sort_recursive(a, base_level=0, base_idx=0):
-        """
-        The main recursive function that performs sorting and generates steps.
-        It updates the global_tree_state in place when a merge is complete.
-        """
-        n = len(a)
-        if n <= 1:
+
+    # Recursive merge sort that updates the global tree and emits snapshots
+    def sort_and_record(a, level=0, idx=0):
+        # base: single element => already present in global_tree_state
+        if len(a) <= 1:
+            # show the leaf as reached (split snapshot)
+            steps.append(snapshot(info=f"Reached leaf: {a}", active=[{"level": level, "idx": idx}]))
+            # mark leaf done (optional) — but we wait until merges to mark real done
             return a[:]
 
-        mid = n // 2
-        
-        # Recursive calls
-        left = do_sort_recursive(a[:mid], base_level + 1, base_idx * 2)
-        right = do_sort_recursive(a[mid:], base_level + 1, base_idx * 2 + 1)
-        
-        # --- Merging Starts (Conquer & Combine Phase) ---
-        
-        child1 = {"level": base_level + 1, "idx": base_idx * 2}
-        child2 = {"level": base_level + 1, "idx": base_idx * 2 + 1}
-        parent = {"level": base_level, "idx": base_idx}
-
-        # Step: Highlight the two sub-lists that are about to be merged
+        # Split snapshot (highlight current node and its children)
         steps.append(snapshot(
-            info=f"Merging sub-lists: {left} and {right}",
-            active=[child1, child2]
+            info=f"Splitting node: {a}",
+            active=[{"level": level, "idx": idx},
+                    {"level": level + 1, "idx": idx * 2},
+                    {"level": level + 1, "idx": idx * 2 + 1}]
         ))
-        
-        # Perform the actual merge (standard merge sort logic)
-        merged = []
+
+        mid = len(a) // 2
+        left = sort_and_record(a[:mid], level + 1, idx * 2)
+        right = sort_and_record(a[mid:], level + 1, idx * 2 + 1)
+
+        # Before merging: highlight the two child nodes
+        steps.append(snapshot(
+            info=f"About to merge {left} and {right}",
+            active=[{"level": level + 1, "idx": idx * 2}, {"level": level + 1, "idx": idx * 2 + 1}]
+        ))
+
+        # perform merge
         i = j = 0
+        merged = []
         while i < len(left) and j < len(right):
             if left[i] <= right[j]:
-                merged.append(left[i])
-                i += 1
+                merged.append(left[i]); i += 1
             else:
-                merged.append(right[j])
-                j += 1
-        merged.extend(left[i:])
-        merged.extend(right[j:])
+                merged.append(right[j]); j += 1
+        if i < len(left):
+            merged.extend(left[i:])
+        if j < len(right):
+            merged.extend(right[j:])
 
-        # Step: Update the parent node in the global state with the merged result
-        global_tree_state[base_level][base_idx] = merged
-        
-        # Step: Show the sorted result, marking the children as 'done' (merged)
+        # Place merged into parent's spot in the global state
+        global_tree_state[level][idx] = merged[:]
+
+        # After merging snapshot: mark children as done and parent as updated
         steps.append(snapshot(
-            info=f"Merged and sorted result: {merged}",
-            done=[child1, child2, parent] # Mark children as merged, and parent as the newly sorted list
+            info=f"Merged into {merged}",
+            done=[
+                {"level": level + 1, "idx": idx * 2},
+                {"level": level + 1, "idx": idx * 2 + 1},
+                {"level": level, "idx": idx}
+            ]
         ))
-        
         return merged
-    
-    # ------------------ Execution Start ------------------
-    
-    # 1. Initialize the global state by splitting the array completely
-    build_initial_tree(arr[:], global_tree_state)
-    
-    # Step 1: Show the complete split tree (Matches the Divide phase in the image)
-    steps.append(snapshot(info="Steps 1-2: Split array into sub-lists recursively down to individual elements/pairs."))
 
-    # Step 2: Call the recursive function to start the merging process
-    do_sort_recursive(arr[:])
-    
-    # Step 3: Final step showing the completed list
-    steps.append(snapshot(info="Merge Sort Complete. Full list is sorted.", done=[{"level": 0, "idx": 0}]))
-    
+    # Initialize tree placeholders by splitting completely
+    build_initial_tree(arr[:])  # fills global_tree_state with all nodes and leaves
+
+    # First snapshot: show full split tree
+    steps.append(snapshot(info="Initial full split structure (divide phase)"))
+
+    # Start recursion (this will append split & merge snapshots)
+    sort_and_record(arr[:], level=0, idx=0)
+
+    # Final snapshot: fully sorted at root
+    steps.append(snapshot(info="Merge Sort complete", done=[{"level": 0, "idx": 0}]))
+
     return steps
-
-    do_sort(arr[:])
-    return steps
-
 
 def quick_sort_steps(arr):
+    arr = _convert_input(arr)
     steps = []
-    arr = arr[:]
 
-    def quick_sort(a, low, high):
+    def record_state(array, low, high, pivot_index, left_ptr, right_ptr, action, message):
+        steps.append({
+            "array": array.copy(),
+            "low": low,
+            "high": high,
+            "pivot_index": pivot_index,
+            "left_ptr": left_ptr,
+            "right_ptr": right_ptr,
+            "action": action,
+            "message": message
+        })
+
+    def partition(low, high):
+        pivot = arr[low]
+        left = low + 1
+        right = high
+
+        record_state(arr, low, high, low, left, right, "init", f"Starting partition from index {low} to {high} with pivot {pivot}")
+
+        while True:
+            while left <= right and arr[left] < pivot:
+                record_state(arr, low, high, low, left, right, "left_stop", f"Left pointer moved right to {left}, value {arr[left]}")
+                left += 1
+
+            while left <= right and arr[right] > pivot:
+                record_state(arr, low, high, low, left, right, "right_stop", f"Right pointer moved left to {right}, value {arr[right]}")
+                right -= 1
+
+            if left > right:
+                break
+
+            arr[left], arr[right] = arr[right], arr[left]
+            record_state(arr, low, high, low, left, right, "swap", f"Swapped elements at {left} and {right}: {arr[left]} ↔ {arr[right]}")
+
+        arr[low], arr[right] = arr[right], arr[low]
+        record_state(arr, low, high, low, left, right, "final_placement", f"Placed pivot {pivot} in correct position at index {right}")
+
+        return right
+
+    def quick_sort(low, high):
         if low < high:
-            p = partition(a, low, high)
-            quick_sort(a, low, p-1)
-            quick_sort(a, p+1, high)
+            p = partition(low, high)
+            quick_sort(low, p - 1)
+            quick_sort(p + 1, high)
+        else:
+            record_state(arr, low, high, low, None, None, "done", "Subarray of size 1 or empty — already sorted.")
 
-    def partition(a, low, high):
-        pivot = a[high]
-        i = low-1
-        for j in range(low, high):
-            steps.append({"array": list(a), "highlight": [j, high], "action": "compare"})
-            if a[j] < pivot:
-                i += 1
-                a[i], a[j] = a[j], a[i]
-                steps.append({"array": list(a), "highlight": [i, j], "action": "swap"})
-        a[i+1], a[high] = a[high], a[i+1]
-        steps.append({"array": list(a), "highlight": [i+1, high], "action": "swap"})
-        return i+1
-
-    quick_sort(arr, 0, len(arr)-1)
-    steps.append({"array": list(arr), "highlight": [], "action": "done"})
+    quick_sort(0, len(arr) - 1)
     return arr, steps
+
+
+
 
 
 # ------------------ Searching ------------------
@@ -366,29 +414,227 @@ def bst_insert_steps(arr):
 
 
 # ------------------ DFS / BFS ------------------
-def dfs_steps(graph, start):
+# algorithms.py
+# Contains the core algorithm logic for various visualizations.
+
+# logic.py
+
+"""
+This module contains the step-by-step logic for various algorithms
+to be used in a visualization application. Each function returns a list
+of 'steps', where each step is a dictionary describing the state of 
+the visualization (e.g., array, visited set, stack) at that point.
+"""
+
+import math
+
+# --- Graph Algorithms ---
+
+def dfs_steps(graph, start=None):
+    """
+    Iterative DFS returning steps for visualization.
+    Each step includes:
+      - current node
+      - visited nodes
+      - stack state
+      - interpretation
+    If start is None, pick the first node in the graph automatically.
+    """
+    if not graph:
+        return []
+
+    if start is None:
+        start = next(iter(graph.keys()))  # pick first node automatically
+
     visited = set()
     stack = [start]
     steps = []
+
     while stack:
-        node = stack.pop()
-        if node not in visited:
-            visited.add(node)
-            steps.append({"visited": sorted(list(visited)), "current": node, "action": "visit"})
-            stack.extend(reversed(graph.get(node, [])))
-    steps.append({"visited": sorted(list(visited)), "current": None, "action": "done"})
+        current = stack.pop()
+        if current not in visited:
+            visited.add(current)
+            steps.append({
+                "current": current,
+                "visited": list(visited),
+                "stack": list(stack),
+                "interpretation": f"Visiting node {current}, stack contains {list(stack)}"
+            })
+            # Add neighbors in reversed order to preserve DFS order
+            for neighbor in reversed(graph.get(current, [])):
+                if neighbor not in visited:
+                    stack.append(neighbor)
     return steps
 
 
-def bfs_steps(graph, start):
+def bfs_steps(graph, start=None):
+    """
+    Iterative BFS returning steps for visualization.
+    Each step includes:
+      - current node
+      - visited nodes
+      - queue state
+      - interpretation
+    If start is None, pick the first node in the graph automatically.
+    """
+    if not graph:
+        return []
+
+    if start is None:
+        start = next(iter(graph.keys()))
+
     visited = set()
     queue = [start]
-    steps = [{"visited": [], "current": start, "action": "visit"}]
+    steps = []
+
     while queue:
-        node = queue.pop(0)
-        if node not in visited:
-            visited.add(node)
-            steps.append({"visited": sorted(list(visited)), "current": node, "action": "visit"})
-            queue.extend(graph.get(node, []))
-    steps.append({"visited": sorted(list(visited)), "current": None, "action": "done"})
+        current = queue.pop(0)
+        if current not in visited:
+            visited.add(current)
+            steps.append({
+                "current": current,
+                "visited": list(visited),
+                "queue": list(queue),
+                "interpretation": f"Visiting node {current}, queue contains {list(queue)}"
+            })
+            # Add neighbors in order
+            for neighbor in graph.get(current, []):
+                if neighbor not in visited and neighbor not in queue:
+                    queue.append(neighbor)
     return steps
+
+
+# algorithms.py (Heap Sort addition with inner helper functions)
+
+# algorithms.py (Modified Heap Sort Logic)
+import math
+
+# --- PYTHON MIN-HEAP LOGIC INSIDE HEAP SORT ---
+# heap_logic.py
+def heap_sort_steps(arr, heap_type="max"):
+    """
+    Generates a list of steps for visualizing the Heap Sort algorithm.
+    Each step is a dictionary containing the array state, heap size,
+    highlighted indices, and the action taken.
+
+    Args:
+        arr (list): The array to be sorted (modified in place for tracking).
+        heap_type (str): "max" for max-heap (ascending sort), "min" for min-heap (descending sort).
+
+    Returns:
+        list: A sequence of step dictionaries.
+    """
+    steps = []
+    n = len(arr)
+
+    def compare(a, b):
+        """Custom comparison function based on heap_type."""
+        return a > b if heap_type == "max" else a < b
+
+    def heapify(arr, heap_size, i):
+        """
+        Performs heapify operation at index i and logs the steps.
+        heap_size 'n' is the current boundary of the heap within the array.
+        """
+        largest = i
+        l = 2 * i + 1
+        r = 2 * i + 2
+
+        # 1. Log the state at the start of heapify (to check property)
+        highlights = [i]
+        if l < heap_size: highlights.append(l)
+        if r < heap_size: highlights.append(r)
+        
+        steps.append({
+            "array": arr.copy(),
+            "heap_size": heap_size,
+            "highlight": highlights,
+            "action": "compare_check",
+            "info": f"Check heap property for node {i} (val: {arr[i]})"
+        })
+
+        # 2. Determine largest/smallest index
+        if l < heap_size and compare(arr[l], arr[largest]):
+            largest = l
+        if r < heap_size and compare(arr[r], arr[largest]):
+            largest = r
+
+        # 3. If the largest/smallest is not the root, swap and recurse
+        if largest != i:
+            # Perform swap
+            arr[i], arr[largest] = arr[largest], arr[i]
+            
+            # Log the swap action
+            steps.append({
+                "array": arr.copy(),
+                "heap_size": heap_size,
+                "highlight": [i, largest],
+                "action": "swap_fix_heap",
+                "info": f"Swap index {i} and {largest} to fix heap property"
+            })
+            
+            # Recursively heapify the affected sub-tree
+            heapify(arr, heap_size, largest)
+        else:
+            # FIX: Log successful heap property (no swap needed)
+            steps.append({
+                "array": arr.copy(),
+                "heap_size": heap_size,
+                "highlight": [i],
+                "action": "heapify_end_ok",
+                "info": f"Heap property holds at index {i}. Subtree is a valid heap."
+            })
+
+    # --- 1. Build Heap Phase ---
+    # The heap starts from the first non-leaf node (n // 2 - 1) up to the root (0)
+    steps.append({
+        "array": arr.copy(),
+        "heap_size": n,
+        "highlight": [],
+        "action": "start_build_heap",
+        "info": f"Starting Build Heap phase ({heap_type}-heap)"
+    })
+
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+
+    # --- 2. Extract Elements and Sort Phase ---
+    steps.append({
+        "array": arr.copy(),
+        "heap_size": n,
+        "highlight": [],
+        "action": "start_sort_phase",
+        "info": "Starting Sort Phase (Extracting elements)"
+    })
+
+    for i in range(n - 1, 0, -1):
+        # Swap root (max/min element) with the last element of the unsorted region
+        arr[0], arr[i] = arr[i], arr[0]
+        
+        # Log the extraction swap. The new heap size is i.
+        steps.append({
+            "array": arr.copy(),
+            "heap_size": i, # The new heap size for the next heapify
+            "highlight": [0, i],
+            "action": "swap_root_extract",
+            "info": f"Swap root (0) with index {i}. Element at {i} is now sorted."
+        })
+        
+        # Call heapify on the reduced heap
+        heapify(arr, i, 0)
+
+    # --- 3. Final Step ---
+    steps.append({
+        "array": arr.copy(),
+        "heap_size": 0,
+        "highlight": list(range(n)),
+        "action": "sorted",
+        "info": "Array sorted successfully."
+    })
+
+    return steps
+
+# Example Usage (optional, for testing):
+# array_to_sort = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+# steps = heap_sort_steps(array_to_sort.copy())
+# print(steps)
