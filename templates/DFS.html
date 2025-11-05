@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFS Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #181825;
+            --card: #232334;
+            --muted: #a1a1aa;
+            --accent: #8b5cf6;
+            --done: #34d399;
+            --text-main: #ede9fe;
+            --text-sub: #d1d5db;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            margin: 0 auto 30px auto;
+            color: var(--accent) !important;
+            font-size: 5rem !important;
+            font-weight: 800 !important;
+            padding-bottom: 14px;
+            text-align: center;
+            display: block;
+        }
+
+        #dfs-theory {
+            margin-bottom: 25px;
+            padding: 25px;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            border: 2px solid var(--accent);
+            max-width: 3000px;
+            margin-inline: auto;
+        }
+
+        #dfs-theory h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--done);
+            margin-bottom: 12px;
+        }
+
+        #dfs-theory p,
+        #dfs-theory li {
+            color: var(--text-sub);
+            font-size: 1rem;
+        }
+
+        #dfs-theory ol {
+            list-style-type: decimal;
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+
+        #user-input-panel {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            margin-bottom: 25px;
+            max-width: 3000px;
+            margin-inline: auto;
+        }
+
+        label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            margin-left: 10px;
+            background: #f8f8f8;
+            color: #000;
+        }
+
+        .control-button {
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: 0.2s;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        .control-button:first-of-type {
+            background: var(--accent);
+            color: white;
+        }
+
+        .control-button:first-of-type:hover {
+            background: #7c3aed;
+        }
+
+        #nextButton {
+            background: #374151;
+            color: var(--text-sub);
+        }
+
+        #nextButton:hover {
+            background: #4b5563;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            background: var(--card);
+            border-radius: 16px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            padding: 25px;
+            max-width: 1000px;
+            margin-inline: auto;
+            gap: 20px;
+        }
+
+        .graph-section {
+            flex: 2;
+            position: relative;
+        }
+
+        .graph-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .data-structures-section {
+            flex: 1;
+            border-left: 1px solid #4b5563;
+            padding-left: 20px;
+        }
+
+        .data-title {
+            font-weight: 700;
+            color: var(--done);
+            margin-bottom: 10px;
+        }
+
+        .array-row {
+            display: flex;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            min-height: 40px;
+            min-width: 100px;
+            background: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .array-cell {
+            padding: 10px 15px;
+            border-right: 1px solid #4b5563;
+            text-align: center;
+            font-weight: bold;
+            min-width: 40px;
+            color: #fff;
+        }
+
+        .array-cell:last-child {
+            border-right: none;
+        }
+
+        .visited-cell {
+            background: var(--done);
+            color: #064e3b;
+            box-shadow: 0 0 10px var(--done);
+        }
+
+        .stack-cell {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .node {
+            stroke: #a1a1aa;
+            stroke-width: 2;
+            fill: #3b3b4f;
+            transition: 0.3s;
+        }
+
+        .node-label {
+            font-size: 16px;
+            font-weight: bold;
+            fill: var(--text-main);
+            pointer-events: none;
+        }
+
+        .node-black {
+            fill: var(--done);
+        }
+
+        .node-blue {
+            fill: var(--accent);
+        }
+
+        .edge {
+            stroke: #666;
+            stroke-width: 2;
+        }
+
+        #interpretation-text {
+            background: #111827;
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border: 1px solid #374151;
+        }
+
+        #errorMessage {
+            border: 2px solid #ef4444;
+            background: #2f3542;
+            color: #f87171;
+            font-weight: 600;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>DFS Traversal</h1>
+
+    <div id="dfs-theory">
+        <h2>What is DFS (Depth-First Search)?</h2>
+        <p><strong>Depth-First Search (DFS)</strong> is a graph traversal algorithm that explores as far as possible along each branch before backtracking. Starting from a source node, DFS moves to an unvisited neighbor, then continues deeper along that path until it reaches a node with no unvisited neighbors, at which point it backtracks to explore other paths. DFS is typically implemented using a stack data structure or recursion. It is widely used in applications like detecting cycles in graphs, topological sorting, solving mazes or puzzles, and finding connected components in a graph. The time complexity of DFS is <strong>O(V + E)</strong> for a graph represented with an adjacency list, since every vertex and edge is visited once, and O(V²) for an adjacency matrix, where each vertex examines all possible edges. The space complexity is O(V) due to the recursion stack or explicit stack and the visited list.</p>
+        <br>
+        <h2>Steps of DFS</h2>
+        <ul>
+            <li>Step 1: Choose a start node and mark it visited.</li>
+            <li>Step 2: Explore each unvisited neighbor deeply before moving to others.</li>
+            <li>Step 3: Use a stack (or recursion) to backtrack when needed.</li>
+            <li>Step 4: Repeat until all nodes are visited.</li>
+            <li>Step 5: DFS completes when there are no unvisited nodes left.</li>
+        </ul>
+    </div>
+
+    <div id="user-input-panel">
+        <label>Vertices:</label>
+        <input type="number" id="vertex-count" min="1" value="5">
+        <label>Edges:</label>
+        <input type="text" id="edges-input" value="0-1,0-2,0-3,1-2,2-4">
+        <br><br>
+        <button class="control-button" onclick="runCustomDFS()">Run DFS</button>
+        <button class="control-button" id="nextButton" onclick="nextStep()">Next Step</button>
+    </div>
+
+    <div class="container">
+        <div class="graph-section">
+            <div class="graph-title">Graph</div>
+            <svg id="dfs-graph" width="450" height="350"></svg>
+        </div>
+
+        <div class="data-structures-section">
+            <div class="data-title">Visited</div>
+            <div class="array-row" id="visited-array"></div>
+            <div class="data-title">Stack</div>
+            <div class="array-row" id="stack-array"></div>
+            <div class="data-title">State Interpretation</div>
+            <p id="interpretation-text">Click "Run DFS" to start.</p>
+        </div>
+    </div>
+
+    <div id="errorMessage" class="hidden"></div>
+
+    <script>
+        let graph = {};
+        let steps = [];
+        let currentStepIndex = -1;
+        let ALL_NODES = [];
+
+        function showMessage(msg) {
+            const div = document.getElementById('errorMessage');
+            div.textContent = msg;
+            div.classList.toggle('hidden', !msg);
+        }
+
+        function parseGraph() {
+            const n = parseInt(document.getElementById('vertex-count').value);
+            const edgesText = document.getElementById('edges-input').value.trim();
+            if (n <= 0) {
+                showMessage("Vertices must be >=1");
+                return false;
+            }
+            graph = {};
+            ALL_NODES = [];
+            for (let i = 0; i < n; i++) {
+                graph[i] = [];
+                ALL_NODES.push(i);
+            }
+            if (edgesText) {
+                const edges = edgesText.split(',');
+                for (const e of edges) {
+                    const [u, v] = e.split('-').map(Number);
+                    if (u >= n || v >= n) {
+                        showMessage("Invalid edge");
+                        return false;
+                    }
+                    graph[u].push(v);
+                    graph[v].push(u);
+                }
+            }
+            showMessage('');
+            return true;
+        }
+
+        function dfsSteps(start) {
+            let visited = new Set();
+            let stack = [start];
+            let result = [];
+            while (stack.length > 0) {
+                let curr = stack.pop();
+                if (!visited.has(curr)) {
+                    visited.add(curr);
+                    result.push({
+                        visited: [...visited],
+                        stack: [...stack],
+                        interpretation: `Visited node ${curr}`
+                    });
+                    let neighbors = graph[curr].filter(v => !visited.has(v)).sort((a, b) => b - a);
+                    stack.push(...neighbors);
+                } else {
+                    result.push({ visited: [...visited], stack: [...stack], interpretation: `Backtracking from node ${curr}` });
+                }
+            }
+            return result;
+        }
+
+        function renderStep() {
+            const svg = document.getElementById('dfs-graph');
+            const visitedDiv = document.getElementById('visited-array');
+            const stackDiv = document.getElementById('stack-array');
+            const interp = document.getElementById('interpretation-text');
+            svg.innerHTML = '';
+            visitedDiv.innerHTML = '';
+            stackDiv.innerHTML = '';
+
+            if (currentStepIndex < 0 || steps.length === 0) {
+                interp.textContent = 'Click "Run DFS"';
+                return;
+            }
+
+            const phase = steps[currentStepIndex];
+            const W = 450, H = 350, R = 120, radius = 20;
+            let pos = {};
+            ALL_NODES.forEach((n, i) => {
+                const angle = 2 * Math.PI * i / ALL_NODES.length - Math.PI / 2;
+                pos[n] = { x: W / 2 + R * Math.cos(angle), y: H / 2 + R * Math.sin(angle) };
+            });
+
+            ALL_NODES.forEach(u => {
+                graph[u].forEach(v => {
+                    if (u < v) {
+                        let line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+                        line.setAttribute('x1', pos[u].x);
+                        line.setAttribute('y1', pos[u].y);
+                        line.setAttribute('x2', pos[v].x);
+                        line.setAttribute('y2', pos[v].y);
+                        line.setAttribute('class', 'edge');
+                        svg.appendChild(line);
+                    }
+                });
+            });
+
+            ALL_NODES.forEach(n => {
+                let circle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+                circle.setAttribute('cx', pos[n].x);
+                circle.setAttribute('cy', pos[n].y);
+                circle.setAttribute('r', radius);
+                circle.setAttribute('class', 'node');
+                if (phase.visited.includes(n)) circle.classList.add('node-black');
+                else if (phase.stack.includes(n)) circle.classList.add('node-blue');
+                svg.appendChild(circle);
+
+                let label = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+                label.setAttribute('x', pos[n].x);
+                label.setAttribute('y', pos[n].y + 5);
+                label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('class', 'node-label');
+                label.textContent = n;
+                svg.appendChild(label);
+            });
+
+            phase.visited.forEach(v => {
+                let div = document.createElement('div');
+                div.className = 'array-cell visited-cell';
+                div.textContent = v;
+                visitedDiv.appendChild(div);
+            });
+
+            phase.stack.forEach(s => {
+                let div = document.createElement('div');
+                div.className = 'array-cell stack-cell';
+                div.textContent = s;
+                stackDiv.appendChild(div);
+            });
+
+            interp.textContent = phase.interpretation;
+        }
+
+        function nextStep() {
+            if (currentStepIndex < steps.length - 1) {
+                currentStepIndex++;
+                renderStep();
+            }
+        }
+
+        function runCustomDFS() {
+            if (!parseGraph()) return;
+            currentStepIndex = -1;
+            steps = dfsSteps(0);
+            if (steps.length > 0) {
+                currentStepIndex = 0;
+                renderStep();
+            }
+        }
+    </script>
+
+</body>
+
+</html>

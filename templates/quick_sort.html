@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Sort Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #181825;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .visualizer-container {
+            background: #232334;
+            border-radius: 18px;
+            padding: 40px;
+            margin: 0 auto;
+            border: 2px solid #8b5cf6;
+            /* Purple border */
+        }
+
+        h1 {
+            margin: 0 auto 30px auto;
+            color: lab(44.95% 69.7 -74.75) !important;
+            font-size: 5rem !important;
+            font-weight: 800 !important;
+            padding-bottom: 14px;
+            text-align: center;
+            display: block;
+        }
+
+        /* Wrapper for each array element and labels */
+        .array-element-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 90px;
+        }
+
+        /* Array element box */
+        .array-element {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #ede9fe;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+            /* Soft purple glow */
+            background: rgba(49, 46, 129, 0.8);
+            /* Dark indigo background */
+            border: 2px solid #6366f1;
+            /* Indigo border */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(.77, 0, .18, 1);
+        }
+
+        /* Pointer labels floating above or below */
+        .pointer-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .pointer-label.top {
+            position: absolute;
+            top: -28px;
+        }
+
+        .pointer-label.bottom {
+            position: absolute;
+            bottom: -28px;
+        }
+
+        .pivot-label {
+            color: #fcd34d;
+            border: 1px solid #fcd34d;
+        }
+
+        .left-label {
+            color: #34d399;
+            border: 1px solid #34d399;
+        }
+
+        .right-label {
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        /* Highlight styles */
+        .highlight-compare {
+            background-color: rgba(59, 130, 246, 0.9);
+            border: 2px solid #2563eb;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #60a5fa;
+        }
+
+        .highlight-swap {
+            background-color: rgba(236, 72, 153, 0.9);
+            border: 2px solid #db2777;
+            transform: scale(1.15) translateY(-5px);
+            box-shadow: 0 0 20px #f472b6;
+        }
+
+        .highlight-sorted {
+            background-color: rgba(52, 211, 153, 0.8);
+            border: 2px solid #047857;
+            box-shadow: 0 0 12px #34d399;
+        }
+
+        .highlight-partition {
+            background-color: rgba(251, 191, 36, 0.9);
+            border: 2px solid #d97706;
+            box-shadow: 0 0 15px #fcd34d;
+            color: #1a202c;
+        }
+
+        /* Buttons */
+        .control-button {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .error-message {
+            border: 2px solid #ef4444;
+            background-color: #450a0a;
+            color: #fca5a5;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body class="p-8 text-white">
+
+    <div class="max-w-5xl mx-auto visualizer-container shadow-2xl">
+        <h1>
+            QUICK SORT
+        </h1>
+
+        <!-- Theory Section -->
+        <div class="mb-8 p-6 bg-gray-900 rounded-xl border border-gray-700">
+            <h2 class="text-3xl font-bold text-teal-400 mb-4">What is Quick Sort?</h2>
+            <p class="text-gray-300 text-base mb-4">
+                <strong>Quick Sort</strong> Quick Sort is a highly efficient, comparison-based, divide-and-conquer
+                sorting algorithm. It works by selecting a pivot element from the array and dividing the remaining
+                elements into two sub-arrays: elements less than the pivot go to the left, and elements greater than the
+                pivot go to the right. The choice of pivot and the partitioning process are key to its efficiency. Quick
+                Sort is an in-place algorithm, meaning it doesn’t require extra space for another array, which makes it
+                memory-efficient.
+            </p>
+            <p class="text-gray-300 text-base mb-4">
+                The algorithm then recursively applies the same process to the left and right sub-arrays until the
+                entire array is sorted. During partitioning, two pointers—Left and Right—move toward each other,
+                swapping elements that are on the wrong side of the pivot. Finally, the pivot is placed in its correct
+                sorted position. Quick Sort has an average time complexity of O(n log n), though in the worst case it
+                can be O(n²) if the pivot choices are poor. Its efficiency and in-place nature make it one of the most
+                widely used sorting algorithms.
+            </p>
+            <h3 class="text-xl font-semibold text-purple-300 mb-2 mt-4">Steps</h3>
+            <ul>
+                <li>Step1: Choose Pivot – usually the first element.</li>
+                <li>Step2: Initialize Pointers – Left after pivot, Right at end.</li>
+                <li>Step3: Move Pointers</li>
+                <ol>
+                <li>Left → stops at ≥ pivot</li>
+                <li>Right → stops at ≤ pivot</li></ol>
+                <li>Step4: Swap Elements if Left ≤ Right.</li>
+                <li>Step5: Repeat until pointers cross.</li>
+                <li>Step6: Place Pivot at Right pointer’s position.</li>
+                <li>Step7: Recursively Sort Left and Right subarrays.</li>
+            </ul>
+        </div>
+
+        <!-- Input Section -->
+        <div class="space-y-4 mb-8 p-6 bg-gray-900 rounded-xl border border-purple-700">
+            <label for="arrayInput" class="block text-lg font-medium text-purple-300">
+                Input Array (comma-separated numbers)
+            </label>
+            <input type="text" id="arrayInput" placeholder="23, 8, 28, 13, 18, 26"
+                class="w-full px-4 py-3 bg-gray-800 border border-purple-600 rounded-lg text-purple-200 placeholder-purple-400 focus:ring-purple-500 focus:border-purple-500">
+            <button onclick="runVisualization()" id="runButton"
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-xl transition duration-150 ease-in-out">
+                Run Quick Sort
+            </button>
+        </div>
+
+        <!-- Visualization Section -->
+        <div id="visualizationArea" class="hidden">
+            <div class="text-purple-300 mb-6 text-xl font-semibold text-center" id="stepInfo"></div>
+            <div class="flex flex-nowrap justify-center gap-4 p-6 bg-gray-900 rounded-xl shadow-inner mb-8 border border-gray-700 overflow-x-auto"
+                id="arrayContainer"></div>
+            <div class="flex justify-between items-center space-x-4">
+                <button onclick="prevStep()" id="prevButton" disabled
+                    class="control-button px-6 py-3 bg-purple-900 hover:bg-purple-800 text-purple-300 font-bold rounded-xl border border-purple-700">
+                    &larr; Previous Step
+                </button>
+                <div id="stepCounter" class="text-xl font-bold text-teal-400">Step 0 / 0</div>
+                <button onclick="nextStep()" id="nextButton" disabled
+                    class="control-button px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-xl shadow-md">
+                    Next Step &rarr;
+                </button>
+            </div>
+        </div>
+
+        <div id="message" class="mt-6 text-center font-medium p-3 rounded-lg hidden"></div>
+    </div>
+
+    <script>
+        const ARRAY_CONTAINER = document.getElementById('arrayContainer');
+        const STEP_INFO = document.getElementById('stepInfo');
+        const STEP_COUNTER = document.getElementById('stepCounter');
+        const PREV_BUTTON = document.getElementById('prevButton');
+        const NEXT_BUTTON = document.getElementById('nextButton');
+        const MESSAGE = document.getElementById('message');
+        const VISUALIZATION_AREA = document.getElementById('visualizationArea');
+        const RUN_BUTTON = document.getElementById('runButton');
+        const ARRAY_INPUT = document.getElementById('arrayInput');
+
+        let steps = [];
+        let currentStepIndex = -1;
+        const API_URL = '/run-algo'; // Backend API
+
+        function showMessage(text, isError = false) {
+            MESSAGE.textContent = text;
+            MESSAGE.className = 'mt-6 text-center font-medium p-3 rounded-lg';
+            if (text) {
+                MESSAGE.classList.remove('hidden');
+                if (isError) MESSAGE.classList.add('error-message');
+                else MESSAGE.classList.add('text-yellow-400', 'bg-yellow-900/20');
+            } else MESSAGE.classList.add('hidden');
+        }
+
+        async function fetchSteps(array) {
+            showMessage('Fetching steps from server...', false);
+            RUN_BUTTON.disabled = true;
+            try {
+                const maxRetries = 3;
+                let lastError = null;
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ algo: 'quick', arr: array })
+                        });
+                        const data = await response.json();
+                        if (!response.ok || data.error) throw new Error(data.error || response.statusText);
+                        steps = data.steps;
+                        showMessage('');
+                        return true;
+                    } catch (err) { lastError = err; if (i < maxRetries - 1) await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000)); }
+                }
+                throw lastError;
+            } catch (err) {
+                showMessage(`Error: Failed to fetch steps. ${err.message}`, true);
+                steps = [];
+                return false;
+            } finally { RUN_BUTTON.disabled = false; }
+        }
+
+        function renderStep() {
+            if (steps.length === 0 || currentStepIndex < 0) {
+                const rawInput = ARRAY_INPUT.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                ARRAY_CONTAINER.innerHTML = rawInput.map(value => `
+            <div class="array-element-wrapper">
+                <div class="array-element">${value}</div>
+            </div>`).join('');
+                STEP_INFO.textContent = 'Enter an array and click "Run Quick Sort" to visualize.';
+                STEP_COUNTER.textContent = 'Step 0 / 0';
+                PREV_BUTTON.disabled = true;
+                NEXT_BUTTON.disabled = true;
+                return;
+            }
+
+            const step = steps[currentStepIndex];
+            const array = step.array;
+            const pivotIndex = step.pivot_index;
+            const leftPtr = step.left_ptr;
+            const rightPtr = step.right_ptr;
+            const action = step.action;
+            const message = step.message;
+            STEP_INFO.textContent = message;
+
+            ARRAY_CONTAINER.innerHTML = array.map((value, index) => {
+                let actionClass = '';
+                if (action === 'swap' && (index === leftPtr || index === rightPtr)) actionClass = 'highlight-swap';
+                else if (action === 'left_stop' && index === leftPtr) actionClass = 'highlight-compare';
+                else if (action === 'right_stop' && index === rightPtr) actionClass = 'highlight-compare';
+                else if (action === 'final_placement' && index === pivotIndex) actionClass = 'highlight-partition';
+                else if (action === 'done') actionClass = 'highlight-sorted';
+
+                let topLabel = '';
+                let bottomLabel = '';
+                if (index === pivotIndex) topLabel = 'Pivot';
+                if (index === leftPtr) bottomLabel = 'Left';
+                if (index === rightPtr) bottomLabel = (bottomLabel ? bottomLabel + ' / ' : '') + 'Right';
+
+                return `<div class="array-element-wrapper">
+            ${topLabel ? `<div class="pointer-label top pivot-label">${topLabel}</div>` : ''}
+            <div class="array-element ${actionClass}">${value}</div>
+            ${bottomLabel ? `<div class="pointer-label bottom ${bottomLabel.includes('Left') ? 'left-label' : 'right-label'}">${bottomLabel}</div>` : ''}
+        </div>`;
+            }).join('');
+
+            STEP_COUNTER.textContent = `Step ${currentStepIndex} / ${steps.length - 1}`;
+            PREV_BUTTON.disabled = currentStepIndex <= 0;
+            NEXT_BUTTON.disabled = currentStepIndex >= steps.length - 1;
+        }
+
+        function nextStep() { if (currentStepIndex < steps.length - 1) { currentStepIndex++; renderStep(); } }
+        function prevStep() { if (currentStepIndex > 0) { currentStepIndex--; renderStep(); } }
+
+        async function runVisualization() {
+            const rawInput = ARRAY_INPUT.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            if (rawInput.length === 0) { showMessage('Input array cannot be empty', true); VISUALIZATION_AREA.classList.add('hidden'); return; }
+            VISUALIZATION_AREA.classList.remove('hidden');
+            const success = await fetchSteps(rawInput);
+            if (success && steps.length > 0) { currentStepIndex = 0; renderStep(); } else { currentStepIndex = -1; renderStep(); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { renderStep(); });
+    </script>
+
+</body>
+
+</html>
