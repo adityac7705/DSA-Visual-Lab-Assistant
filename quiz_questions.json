@@ -2,55 +2,910 @@
   "stack": [
     {
       "question": "Which order does a stack follow?",
-      "options": ["FIFO", "LIFO", "Random"],
+      "options": [
+        "FIFO",
+        "LIFO",
+        "Random"
+      ],
       "answer": "LIFO"
     },
     {
       "question": "Which operation removes the top of the stack?",
-      "options": ["push", "pop", "enqueue"],
+      "options": [
+        "push",
+        "pop",
+        "enqueue"
+      ],
       "answer": "pop"
     },
     {
       "question": "Stack is mainly used for?",
-      "options": ["Backtracking", "Sorting", "Searching"],
+      "options": [
+        "Backtracking",
+        "Sorting",
+        "Searching"
+      ],
       "answer": "Backtracking"
     },
     {
       "question": "Which data structure supports recursion?",
-      "options": ["Queue", "Stack", "Array"],
+      "options": [
+        "Queue",
+        "Stack",
+        "Array"
+      ],
       "answer": "Stack"
     },
     {
       "question": "Stack overflow occurs when?",
-      "options": ["Stack empty", "Stack full", "Stack half full"],
+      "options": [
+        "Stack empty",
+        "Stack full",
+        "Stack half full"
+      ],
       "answer": "Stack full"
+    },
+    {
+      "question": "Which operation adds an element to the stack?",
+      "options": [
+        "push",
+        "pop",
+        "enqueue"
+      ],
+      "answer": "push"
+    },
+    {
+      "question": "Which of these is not a stack operation?",
+      "options": [
+        "push",
+        "peek",
+        "dequeue"
+      ],
+      "answer": "dequeue"
+    },
+    {
+      "question": "The top element of the stack can be viewed by?",
+      "options": [
+        "peek",
+        "push",
+        "pop"
+      ],
+      "answer": "peek"
+    },
+    {
+      "question": "Stack can be implemented using?",
+      "options": [
+        "Array",
+        "Linked List",
+        "Both Array and Linked List"
+      ],
+      "answer": "Both Array and Linked List"
+    },
+    {
+      "question": "Applications of stack include?",
+      "options": [
+        "Expression evaluation",
+        "Undo mechanism in editors",
+        "Both"
+      ],
+      "answer": "Both"
     }
   ],
   "queue": [
     {
       "question": "What order does a queue follow?",
-      "options": ["LIFO", "FIFO", "Random"],
+      "options": [
+        "LIFO",
+        "FIFO",
+        "Random"
+      ],
       "answer": "FIFO"
     },
     {
       "question": "Which operation adds to the back of a queue?",
-      "options": ["pop", "enqueue", "dequeue"],
+      "options": [
+        "pop",
+        "enqueue",
+        "dequeue"
+      ],
       "answer": "enqueue"
     },
     {
       "question": "Which operation removes from the front of a queue?",
-      "options": ["pop", "enqueue", "dequeue"],
+      "options": [
+        "pop",
+        "enqueue",
+        "dequeue"
+      ],
       "answer": "dequeue"
     },
     {
       "question": "Circular queue helps reduce?",
-      "options": ["Space wastage", "Time complexity", "Memory leaks"],
+      "options": [
+        "Space wastage",
+        "Time complexity",
+        "Memory leaks"
+      ],
       "answer": "Space wastage"
     },
     {
       "question": "Queue is used for?",
-      "options": ["Buffer handling", "Sorting", "Searching"],
+      "options": [
+        "Buffer handling",
+        "Sorting",
+        "Searching"
+      ],
       "answer": "Buffer handling"
+    },
+    {
+      "question": "Priority queue arranges elements based on?",
+      "options": [
+        "FIFO",
+        "Priority",
+        "Random"
+      ],
+      "answer": "Priority"
+    },
+    {
+      "question": "Dequeue operation in a double-ended queue can be performed from?",
+      "options": [
+        "Front only",
+        "Rear only",
+        "Both Front and Rear"
+      ],
+      "answer": "Both Front and Rear"
+    },
+    {
+      "question": "Which of these is not a type of queue?",
+      "options": [
+        "Circular queue",
+        "Priority queue",
+        "Sorted stack"
+      ],
+      "answer": "Sorted stack"
+    },
+    {
+      "question": "In a normal queue, insertion happens at?",
+      "options": [
+        "Front",
+        "Rear",
+        "Anywhere"
+      ],
+      "answer": "Rear"
+    },
+    {
+      "question": "In a normal queue, deletion happens at?",
+      "options": [
+        "Front",
+        "Rear",
+        "Anywhere"
+      ],
+      "answer": "Front"
+    }
+  ],
+  "linear": [
+    {
+      "question": "Linear search works by?",
+      "options": [
+        "Checking each element sequentially",
+        "Dividing the list into halves",
+        "Using hash functions"
+      ],
+      "answer": "Checking each element sequentially"
+    },
+    {
+      "question": "Best case of linear search occurs when?",
+      "options": [
+        "Element is at the beginning",
+        "Element is at the end",
+        "Element is not present"
+      ],
+      "answer": "Element is at the beginning"
+    },
+    {
+      "question": "Worst case of linear search occurs when?",
+      "options": [
+        "Element is at the beginning",
+        "Element is at the end",
+        "Element is somewhere in the middle"
+      ],
+      "answer": "Element is at the end"
+    },
+    {
+      "question": "Time complexity of linear search in average case is?",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)"
+      ],
+      "answer": "O(n)"
+    },
+    {
+      "question": "Linear search can be applied to?",
+      "options": [
+        "Sorted list only",
+        "Unsorted list only",
+        "Both sorted and unsorted lists"
+      ],
+      "answer": "Both sorted and unsorted lists"
+    },
+    {
+      "question": "Linear search is also called?",
+      "options": [
+        "Sequential search",
+        "Binary search",
+        "Hash search"
+      ],
+      "answer": "Sequential search"
+    },
+    {
+      "question": "Linear search is preferred when?",
+      "options": [
+        "List is small",
+        "List is huge",
+        "List is sorted"
+      ],
+      "answer": "List is small"
+    },
+    {
+      "question": "If element is not present, linear search will check?",
+      "options": [
+        "All elements",
+        "Only half elements",
+        "None"
+      ],
+      "answer": "All elements"
+    },
+    {
+      "question": "Linear search works on?",
+      "options": [
+        "Arrays",
+        "Linked lists",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "Linear search is inefficient for?",
+      "options": [
+        "Small datasets",
+        "Large datasets",
+        "Both"
+      ],
+      "answer": "Large datasets"
+    }
+  ],
+  "binary": [
+    {
+      "question": "Binary search requires the data to be?",
+      "options": [
+        "Unsorted",
+        "Sorted",
+        "Random"
+      ],
+      "answer": "Sorted"
+    },
+    {
+      "question": "Which search has O(log n) time complexity?",
+      "options": [
+        "Linear search",
+        "Binary search",
+        "Sequential search"
+      ],
+      "answer": "Binary search"
+    },
+    {
+      "question": "Best case of binary search occurs when?",
+      "options": [
+        "Element is at the middle",
+        "Element is at the start",
+        "Element is at the end"
+      ],
+      "answer": "Element is at the middle"
+    },
+    {
+      "question": "Worst case time complexity of binary search is?",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)"
+      ],
+      "answer": "O(log n)"
+    },
+    {
+      "question": "Binary search cannot be used if?",
+      "options": [
+        "Array is sorted",
+        "Array is unsorted",
+        "Array has duplicates"
+      ],
+      "answer": "Array is unsorted"
+    },
+    {
+      "question": "Binary search works on which data structures?",
+      "options": [
+        "Array only",
+        "Linked list only",
+        "Array and sorted list"
+      ],
+      "answer": "Array and sorted list"
+    },
+    {
+      "question": "Binary search uses which approach?",
+      "options": [
+        "Divide and conquer",
+        "Brute force",
+        "Greedy"
+      ],
+      "answer": "Divide and conquer"
+    },
+    {
+      "question": "Number of comparisons in binary search is maximum when?",
+      "options": [
+        "Element is at middle",
+        "Element is at start or end",
+        "Element is not present"
+      ],
+      "answer": "Element is not present"
+    },
+    {
+      "question": "Binary search can be implemented using?",
+      "options": [
+        "Recursion",
+        "Iteration",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "Binary search is more efficient than linear search when?",
+      "options": [
+        "Dataset is small",
+        "Dataset is large and sorted",
+        "Dataset is unsorted"
+      ],
+      "answer": "Dataset is large and sorted"
+    }
+  ],
+  "merge": [
+    {
+      "question": "Merge sort follows which algorithmic approach?",
+      "options": [
+        "Divide and Conquer",
+        "Greedy",
+        "Dynamic Programming"
+      ],
+      "answer": "Divide and Conquer"
+    },
+    {
+      "question": "Best case time complexity of merge sort is?",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)"
+      ],
+      "answer": "O(n log n)"
+    },
+    {
+      "question": "Worst case time complexity of merge sort is?",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)"
+      ],
+      "answer": "O(n log n)"
+    },
+    {
+      "question": "Merge sort is stable. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Merge sort requires extra space?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": "Yes"
+    },
+    {
+      "question": "Merge sort works best for?",
+      "options": [
+        "Linked lists",
+        "Arrays",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "Merge operation in merge sort combines?",
+      "options": [
+        "Two sorted arrays",
+        "Two unsorted arrays",
+        "Single array"
+      ],
+      "answer": "Two sorted arrays"
+    },
+    {
+      "question": "Merge sort is a recursive algorithm. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Merge sort is efficient for?",
+      "options": [
+        "Large datasets",
+        "Small datasets",
+        "Both"
+      ],
+      "answer": "Large datasets"
+    },
+    {
+      "question": "Merge sort is preferred when?",
+      "options": [
+        "Memory is limited",
+        "Stability is required",
+        "Sorting in-place is required"
+      ],
+      "answer": "Stability is required"
+    }
+  ],
+  "quick": [
+    {
+      "question": "Quick sort uses which approach?",
+      "options": [
+        "Divide and Conquer",
+        "Dynamic Programming",
+        "Greedy"
+      ],
+      "answer": "Divide and Conquer"
+    },
+    {
+      "question": "Worst case time complexity of quick sort is?",
+      "options": [
+        "O(n log n)",
+        "O(n^2)",
+        "O(n)"
+      ],
+      "answer": "O(n^2)"
+    },
+    {
+      "question": "Best case time complexity of quick sort is?",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)"
+      ],
+      "answer": "O(n log n)"
+    },
+    {
+      "question": "Quick sort is stable. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False"
+    },
+    {
+      "question": "Quick sort works in-place. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Partitioning in quick sort is based on?",
+      "options": [
+        "Pivot element",
+        "Middle element",
+        "First element"
+      ],
+      "answer": "Pivot element"
+    },
+    {
+      "question": "Quick sort is preferred for?",
+      "options": [
+        "Large datasets",
+        "Small datasets",
+        "Linked lists"
+      ],
+      "answer": "Large datasets"
+    },
+    {
+      "question": "Recursion in quick sort stops when?",
+      "options": [
+        "Array is empty or has one element",
+        "Array has two elements",
+        "Array is sorted"
+      ],
+      "answer": "Array is empty or has one element"
+    },
+    {
+      "question": "Quick sort is inefficient when?",
+      "options": [
+        "Array is sorted",
+        "Array is random",
+        "Array has duplicates"
+      ],
+      "answer": "Array is sorted"
+    },
+    {
+      "question": "Quick sort can be implemented using?",
+      "options": [
+        "Recursion",
+        "Iteration",
+        "Both"
+      ],
+      "answer": "Both"
+    }
+  ],
+  "heap": [
+    {
+      "question": "Heap sort uses which data structure?",
+      "options": [
+        "Heap",
+        "Stack",
+        "Queue"
+      ],
+      "answer": "Heap"
+    },
+    {
+      "question": "Heap sort is in-place. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Heap sort is stable. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False"
+    },
+    {
+      "question": "Time complexity of heap sort is?",
+      "options": [
+        "O(n log n)",
+        "O(n^2)",
+        "O(n)"
+      ],
+      "answer": "O(n log n)"
+    },
+    {
+      "question": "Heap sort is best suited for?",
+      "options": [
+        "Arrays",
+        "Linked lists",
+        "Both"
+      ],
+      "answer": "Arrays"
+    },
+    {
+      "question": "Heap sort works by repeatedly removing?",
+      "options": [
+        "Maximum or minimum element",
+        "Middle element",
+        "First element"
+      ],
+      "answer": "Maximum or minimum element"
+    },
+    {
+      "question": "Heap sort can be implemented using?",
+      "options": [
+        "Max-heap only",
+        "Min-heap only",
+        "Max-heap or Min-heap"
+      ],
+      "answer": "Max-heap or Min-heap"
+    },
+    {
+      "question": "Heap sort is preferred when?",
+      "options": [
+        "Memory is limited",
+        "Speed is priority",
+        "Stability is required"
+      ],
+      "answer": "Speed is priority"
+    },
+    {
+      "question": "Heapify operation in heap sort builds?",
+      "options": [
+        "Heap from array",
+        "Sorted array",
+        "Linked list"
+      ],
+      "answer": "Heap from array"
+    },
+    {
+      "question": "Heap sort is efficient for?",
+      "options": [
+        "Large datasets",
+        "Small datasets",
+        "Both"
+      ],
+      "answer": "Large datasets"
+    }
+  ],
+  "bubble": [
+    {
+      "question": "Bubble sort repeatedly compares?",
+      "options": [
+        "Adjacent elements",
+        "First and last element",
+        "Random elements"
+      ],
+      "answer": "Adjacent elements"
+    },
+    {
+      "question": "Best case time complexity of bubble sort is?",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)"
+      ],
+      "answer": "O(n)"
+    },
+    {
+      "question": "Worst case time complexity of bubble sort is?",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)"
+      ],
+      "answer": "O(n^2)"
+    },
+    {
+      "question": "Bubble sort is stable. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Bubble sort is in-place. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Bubble sort is inefficient for?",
+      "options": [
+        "Small datasets",
+        "Large datasets",
+        "Sorted datasets"
+      ],
+      "answer": "Large datasets"
+    },
+    {
+      "question": "Bubble sort swaps elements when?",
+      "options": [
+        "Left element > Right element",
+        "Left element < Right element",
+        "Always"
+      ],
+      "answer": "Left element > Right element"
+    },
+    {
+      "question": "Number of passes in bubble sort is?",
+      "options": [
+        "n-1",
+        "n",
+        "n/2"
+      ],
+      "answer": "n-1"
+    },
+    {
+      "question": "Bubble sort is simple to implement. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "Optimized bubble sort stops early when?",
+      "options": [
+        "No swaps in a pass",
+        "First swap occurs",
+        "All elements are equal"
+      ],
+      "answer": "No swaps in a pass"
+    }
+  ],
+  "dfs": [
+    {
+      "question": "DFS stands for?",
+      "options": [
+        "Depth First Search",
+        "Depth Fast Search",
+        "Direct First Search"
+      ],
+      "answer": "Depth First Search"
+    },
+    {
+      "question": "DFS uses which data structure?",
+      "options": [
+        "Stack",
+        "Queue",
+        "Heap"
+      ],
+      "answer": "Stack"
+    },
+    {
+      "question": "DFS can be implemented recursively. True or False?",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True"
+    },
+    {
+      "question": "DFS explores?",
+      "options": [
+        "Deeper nodes first",
+        "Breadth of nodes first",
+        "Random nodes"
+      ],
+      "answer": "Deeper nodes first"
+    },
+    {
+      "question": "DFS is useful for?",
+      "options": [
+        "Topological sorting",
+        "Shortest path in unweighted graph",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "DFS is not suitable for?",
+      "options": [
+        "Finding connected components",
+        "Finding shortest path in weighted graph",
+        "Cycle detection"
+      ],
+      "answer": "Finding shortest path in weighted graph"
+    },
+    {
+      "question": "DFS can be used in?",
+      "options": [
+        "Maze solving",
+        "Pathfinding in games",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "DFS may require which operation when backtracking?",
+      "options": [
+        "Pop",
+        "Push",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "DFS traversal of a tree is?",
+      "options": [
+        "Preorder, Inorder, Postorder",
+        "Level order only",
+        "Random"
+      ],
+      "answer": "Preorder, Inorder, Postorder"
+    },
+    {
+      "question": "DFS can get stuck in?",
+      "options": [
+        "Infinite loops in cyclic graphs",
+        "Disconnected graphs",
+        "Sorted graphs"
+      ],
+      "answer": "Infinite loops in cyclic graphs"
+    }
+  ],
+  "bfs": [
+    {
+      "question": "BFS stands for?",
+      "options": [
+        "Breadth First Search",
+        "Breadth Fast Search",
+        "Binary First Search"
+      ],
+      "answer": "Breadth First Search"
+    },
+    {
+      "question": "BFS uses which data structure?",
+      "options": [
+        "Queue",
+        "Stack",
+        "Heap"
+      ],
+      "answer": "Queue"
+    },
+    {
+      "question": "BFS explores?",
+      "options": [
+        "Level by level",
+        "Deeper nodes first",
+        "Random nodes"
+      ],
+      "answer": "Level by level"
+    },
+    {
+      "question": "BFS is useful for?",
+      "options": [
+        "Shortest path in unweighted graph",
+        "Topological sorting",
+        "Both"
+      ],
+      "answer": "Shortest path in unweighted graph"
+    },
+    {
+      "question": "BFS can be used in?",
+      "options": [
+        "Finding shortest path",
+        "Network broadcasting",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "BFS is suitable for?",
+      "options": [
+        "Graphs with cycles",
+        "Acyclic graphs only",
+        "Neither"
+      ],
+      "answer": "Graphs with cycles"
+    },
+    {
+      "question": "BFS may require which operation when visiting nodes?",
+      "options": [
+        "Enqueue",
+        "Dequeue",
+        "Both"
+      ],
+      "answer": "Both"
+    },
+    {
+      "question": "BFS traversal of a tree is?",
+      "options": [
+        "Level order",
+        "Preorder",
+        "Postorder"
+      ],
+      "answer": "Level order"
+    },
+    {
+      "question": "BFS guarantees?",
+      "options": [
+        "Shortest path in unweighted graph",
+        "Longest path in graph",
+        "Random path"
+      ],
+      "answer": "Shortest path in unweighted graph"
+    },
+    {
+      "question": "BFS cannot be used for?",
+      "options": [
+        "Finding connected components",
+        "Finding topological sort in DAG",
+        "Finding shortest path in weighted graph with negative edges"
+      ],
+      "answer": "Finding shortest path in weighted graph with negative edges"
     }
   ]
 }
