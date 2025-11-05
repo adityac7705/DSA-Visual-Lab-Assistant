@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heap Sort Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #181825;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .visualizer-container {
+            max-width: 72rem;
+            background: #232334;
+            border-radius: 18px;
+            padding: 40px;
+            margin: 0 auto;
+            border: 2px solid #8b5cf6;
+        }
+
+        h1 {
+            margin: 0 auto 30px auto;
+            /* Using a lighter purple for better contrast */
+            color: #d8b4fe !important; 
+            font-size: 5rem !important;
+            font-weight: 800 !important;
+            padding-bottom: 14px;
+            text-align: center;
+            display: block;
+        }
+
+        #treeContainer {
+            min-height: 400px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            position: relative;
+            padding-top: 50px;
+            overflow-x: auto;
+        }
+
+        .tree-node {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #ede9fe;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+            background: rgba(49, 46, 129, 0.9);
+            border: 2px solid #6366f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            transition: all 0.5s ease-in-out;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .tree-link {
+            position: absolute;
+            height: 2px;
+            background-color: rgba(139, 92, 246, 0.5);
+            z-index: 0;
+            transform-origin: 0 0;
+            transition: background-color 0.3s;
+        }
+
+        .highlight-compare {
+            background-color: rgba(251, 191, 36, 0.9);
+            border: 2px solid #d97706;
+            box-shadow: 0 0 15px #fcd34d;
+            color: #1a202c;
+        }
+
+        .highlight-swap {
+            background-color: rgba(236, 72, 153, 0.9);
+            border: 2px solid #db2777;
+            box-shadow: 0 0 20px #f472b6;
+        }
+
+        .highlight-sorted {
+            background-color: rgba(52, 211, 153, 0.8);
+            border: 2px solid #047857;
+            box-shadow: 0 0 12px #34d399;
+        }
+
+        .control-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .error-message {
+            border: 2px solid #ef4444;
+            background-color: #450a0a;
+            color: #fca5a5;
+            font-weight: 700;
+        }
+
+        .heap-type-active {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+            border: 3px solid white;
+        }
+    </style>
+</head>
+
+<body class="p-8 text-white">
+
+    <div class="max-w-6xl mx-auto visualizer-container shadow-2xl">
+        <h1>HEAP SORT</h1>
+
+        <!-- 🧠 THEORY SECTION -->
+        <div class="mb-8 bg-gray-900 border border-purple-700 rounded-xl p-6 leading-relaxed text-gray-300">
+            <h2 class="text-2xl font-semibold text-purple-300 mb-3">Heap Sort Theory</h2>
+            <p><strong>Heap Sort</strong> is a comparison-based sorting algorithm that uses a <strong>binary
+                heap</strong> data structure. It works by first building a heap from the input data and then
+                repeatedly extracting the largest (or smallest) element from the heap to form a sorted array.</p>
+
+            <h3 class="text-lg text-purple-400 font-semibold mt-4">Types of Heaps</h3>
+            <ul class="list-disc list-inside ml-4">
+                <li><span class="text-teal-400 font-semibold">Max Heap</span>: The parent node is always greater than or
+                    equal to its child nodes. (Used for Ascending Sort)</li>
+                <li><span class="text-pink-400 font-semibold">Min Heap</span>: The parent node is always smaller than or
+                    equal to its child nodes. (Used for Descending Sort)</li>
+            </ul>
+
+            <h3 class="text-lg text-purple-400 font-semibold mt-4">Algorithm Steps</h3>
+            <ol class="list-decimal list-inside ml-4 space-y-1">
+                <li>Build a Max Heap (or Min Heap) from the input array.</li>
+                <li>Swap the root (maximum or minimum element) with the last element of the heap.</li>
+                <li>Reduce the heap size by one and heapify the root to maintain the heap property.</li>
+                <li>Repeat until all elements are sorted.</li>
+            </ol>
+
+            <h3 class="text-lg text-purple-400 font-semibold mt-4">Time Complexity</h3>
+            <ul class="list-disc list-inside ml-4">
+                <li>Building Heap: <code>O(n)</code></li>
+                <li>Heapify Operation: <code>O(log n)</code></li>
+                <li>Total: <code>O(n log n)</code></li>
+            </ul>
+
+            <h3 class="text-lg text-purple-400 font-semibold mt-4">Space Complexity</h3>
+            <p class="ml-4"><code>O(1)</code> — In-place sorting algorithm</p>
+
+            <p class="text-yellow-300 mt-4"><strong>Note:</strong> Heap Sort is <strong>not a stable sort</strong> —
+                equal elements may not retain their relative order.</p>
+        </div>
+
+        <!-- INPUT + CONTROL SECTION -->
+        <div class="space-y-4 mb-8 p-6 bg-gray-900 rounded-xl border border-purple-700">
+            <label for="arrayInput" class="block text-lg font-medium text-purple-300">Input Array (comma-separated
+                numbers)</label>
+            <input type="text" id="arrayInput" placeholder="44,14,26,10,31,19,42,35,33,27"
+                class="w-full px-4 py-3 bg-gray-800 border border-purple-600 rounded-lg text-purple-200 placeholder-purple-400 focus:ring-purple-500 focus:border-purple-500">
+
+            <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                <button id="maxHeapButton"
+                    class="heap-type-button bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg heap-type-active"
+                    onclick="setHeapType('max')">Min heap</button>
+                <button id="minHeapButton"
+                    class="heap-type-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg"
+                    onclick="setHeapType('min')">Max heap</button>
+            </div>
+
+            <button onclick="runVisualization()" id="runButton"
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-xl mt-4">Run</button>
+        </div>
+
+        <!-- VISUALIZATION AREA -->
+        <div id="visualizationArea" class="hidden">
+            <div class="text-purple-300 mb-6 text-xl font-semibold text-center" id="stepInfo"></div>
+            <div id="treeContainer" class="p-6 bg-gray-900 rounded-xl shadow-inner mb-8 border border-gray-700"></div>
+
+            <div class="flex justify-between items-center space-x-4">
+                <button onclick="prevStep()" id="prevButton" disabled
+                    class="control-button px-6 py-3 bg-purple-900 hover:bg-purple-800 text-purple-300 font-bold rounded-xl border border-purple-700">&larr;
+                    Previous Step</button>
+                <div id="stepCounter" class="text-xl font-bold text-teal-400">Step 0 / 0</div>
+                <button onclick="nextStep()" id="nextButton" disabled
+                    class="control-button px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-xl shadow-md">Next
+                    Step &rarr;</button>
+            </div>
+        </div>
+
+        <div id="message" class="mt-6 text-center font-medium p-3 rounded-lg hidden"></div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const TREE_CONTAINER = document.getElementById('treeContainer');
+        const STEP_INFO = document.getElementById('stepInfo');
+        const STEP_COUNTER = document.getElementById('stepCounter');
+        const PREV_BUTTON = document.getElementById('prevButton');
+        const NEXT_BUTTON = document.getElementById('nextButton');
+        const MESSAGE = document.getElementById('message');
+        const VISUALIZATION_AREA = document.getElementById('visualizationArea');
+        const RUN_BUTTON = document.getElementById('runButton');
+        const ARRAY_INPUT = document.getElementById('arrayInput');
+
+        // --- State Variables ---
+        let steps = [], currentStepIndex = -1, currentHeapType = 'max';
+        const NODE_RADIUS = 25, LEVEL_HEIGHT = 80;
+
+        // Helper function to display messages or errors
+        function showMessage(text, isError = false) {
+            MESSAGE.textContent = text;
+            MESSAGE.className = 'mt-6 text-center font-medium p-3 rounded-lg';
+            if (text) {
+                MESSAGE.classList.remove('hidden');
+                if (isError) MESSAGE.classList.add('error-message');
+                else MESSAGE.classList.add('text-yellow-400', 'bg-yellow-900/20');
+            } else MESSAGE.classList.add('hidden');
+        }
+
+        // Sets the heap type and updates buttons/UI
+        function setHeapType(type) {
+            currentHeapType = type;
+            document.getElementById('maxHeapButton').classList.remove('heap-type-active');
+            document.getElementById('minHeapButton').classList.remove('heap-type-active');
+            
+            const maxBtn = document.getElementById('maxHeapButton');
+            const minBtn = document.getElementById('minHeapButton');
+
+            // Apply active state
+            if (type === 'max') {
+                maxBtn.classList.add('heap-type-active');
+            } else {
+                minBtn.classList.add('heap-type-active');
+            }
+
+            // Set button text to simply 'Run' as requested.
+            RUN_BUTTON.textContent = 'Run';
+            
+            // Reset visualization state
+            steps = []; currentStepIndex = -1; renderStep();
+        }
+
+        // Calculates the screen position for a node based on its index (i.e., tree layout)
+        function calculateNodePosition(index, totalNodes, heapSize) {
+            if (index >= totalNodes) return { x: 0, y: 0, hidden: true };
+            const level = Math.floor(Math.log2(index + 1));
+            const levelStart = Math.pow(2, level) - 1;
+            const levelIndex = index - levelStart;
+            const totalLevels = Math.ceil(Math.log2(totalNodes + 1));
+            // Calculate width based on the maximum number of nodes at the base
+            const maxNodesAtBase = Math.pow(2, totalLevels - 1);
+            const baseWidth = maxNodesAtBase * (NODE_RADIUS * 2 + 30); // Increased spacing
+            const levelWidth = baseWidth / Math.pow(2, level);
+            
+            const x = levelWidth * (levelIndex + 0.5) - NODE_RADIUS;
+            const y = level * LEVEL_HEIGHT;
+            const isSorted = index >= heapSize;
+            return { x, y, isSorted };
+        }
+
+        // Draws a line between two points for tree visualization
+        function drawLine(x1, y1, x2, y2, isSorted) {
+            x1 += NODE_RADIUS; y1 += NODE_RADIUS; x2 += NODE_RADIUS; y2 += NODE_RADIUS;
+            const dx = x2 - x1, dy = y2 - y1;
+            const angle = Math.atan2(dy, dx);
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const linkClass = isSorted ? 'bg-teal-700' : '';
+            return `<div class="tree-link ${linkClass}" style="left:${x1}px; top:${y1}px; width:${length}px; transform:rotate(${angle}rad)"></div>`;
+        }
+
+        // Renders the current step of the visualization
+        function renderStep() {
+            if (steps.length === 0 || currentStepIndex < 0) {
+                TREE_CONTAINER.innerHTML = `<div class="text-gray-400 text-center py-10">Enter array and run heap sort.</div>`;
+                STEP_INFO.textContent = 'Select Heap Type and click Run.';
+                STEP_COUNTER.textContent = 'Step 0 / 0';
+                PREV_BUTTON.disabled = true; NEXT_BUTTON.disabled = true;
+                TREE_CONTAINER.style.height = '400px';
+                return;
+            }
+
+            const step = steps[currentStepIndex];
+            const array = step.array; 
+            const highlight = step.highlight || [];
+            const heapSize = step.heap_size || array.length;
+            const totalNodes = array.length;
+            STEP_INFO.textContent = step.info || `Action: ${step.action.toUpperCase()}`;
+
+            let linksHtml = '', nodesHtml = '', positions = [];
+            for (let i = 0; i < totalNodes; i++) positions.push(calculateNodePosition(i, totalNodes, heapSize));
+
+            // Calculate tree dimensions for centering and container height
+            let minX = Math.min(...positions.map(p => p.x));
+            let maxX = Math.max(...positions.map(p => p.x));
+            const containerWidth = TREE_CONTAINER.clientWidth;
+            const treeWidth = maxX - minX + NODE_RADIUS * 2 + 50; // Added padding
+            const offsetX = (containerWidth - treeWidth) / 2 - minX + 25; // Adjusted center offset
+
+            const treeHeight = Math.max(...positions.map(p => p.y)) + NODE_RADIUS * 2 + 50;
+            TREE_CONTAINER.style.height = `${treeHeight}px`;
+
+
+            for (let i = 0; i < totalNodes; i++) {
+                const pos = positions[i];
+                const x = pos.x + offsetX;
+                const y = pos.y;
+                const value = array[i];
+                const leftChild = 2 * i + 1, rightChild = 2 * i + 2;
+
+                // Draw links (only within the current heap size)
+                if (leftChild < totalNodes && leftChild < heapSize) linksHtml += drawLine(x, y, positions[leftChild].x + offsetX, positions[leftChild].y, pos.isSorted);
+                if (rightChild < totalNodes && rightChild < heapSize) linksHtml += drawLine(x, y, positions[rightChild].x + offsetX, positions[rightChild].y, pos.isSorted);
+
+                let actionClass = '';
+                
+                // Highlight sorted elements
+                if (i >= heapSize || step.action === 'sorted') {
+                    actionClass = 'highlight-sorted';
+                } else if (highlight.includes(i)) {
+                    // Highlight elements currently involved in an action
+                    if (step.action.startsWith('compare') || step.action === 'heapify_end_ok') {
+                        // Yellow highlight for comparison/check state
+                        actionClass = 'highlight-compare';
+                    } else if (step.action.startsWith('swap')) {
+                        // Pink highlight for a swap action
+                        actionClass = 'highlight-swap';
+                    }
+                }
+
+                nodesHtml += `<div class="tree-node ${actionClass}" style="left:${x}px; top:${y}px;">${value}</div>`;
+            }
+
+            TREE_CONTAINER.innerHTML = linksHtml + nodesHtml;
+
+            STEP_COUNTER.textContent = `Step ${currentStepIndex + 1} / ${steps.length}`;
+            PREV_BUTTON.disabled = currentStepIndex <= 0;
+            NEXT_BUTTON.disabled = currentStepIndex >= steps.length - 1;
+            NEXT_BUTTON.textContent = currentStepIndex === steps.length - 1 ? 'Sorting Complete!' : 'Next Step →';
+        }
+
+        function nextStep() { if (currentStepIndex < steps.length - 1) { currentStepIndex++; renderStep(); } }
+        function prevStep() { if (currentStepIndex > 0) { currentStepIndex--; renderStep(); } }
+
+        // --- Backend Connection Logic (Restored) ---
+        async function runVisualization() {
+            // Get and validate input
+            const rawInput = ARRAY_INPUT.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            if (rawInput.length === 0) { 
+                showMessage('Input array cannot be empty.', true); 
+                VISUALIZATION_AREA.classList.add('hidden'); 
+                return; 
+            }
+            
+            VISUALIZATION_AREA.classList.remove('hidden');
+            showMessage('Fetching steps from backend server...');
+            RUN_BUTTON.disabled = true;
+
+            try {
+                // Fetch sorting steps from the backend
+                const response = await fetch('/run-algo', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ 
+                        algo: 'heap', 
+                        arr: rawInput.map(s => parseInt(s, 10)), // Ensure numbers are sent
+                        heap_type: currentHeapType 
+                    }) 
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || response.statusText || 'Unknown error');
+                }
+                
+                // Set steps and start visualization
+                steps = data.steps; 
+                showMessage(''); 
+                currentStepIndex = 0; 
+                renderStep();
+
+            } catch (e) { 
+                // Handle fetch or JSON parsing errors
+                console.error("Backend communication error:", e);
+                showMessage(`Error communicating with backend: ${e.message}. Ensure the endpoint is available.`, true); 
+                steps = []; 
+                currentStepIndex = -1;
+                renderStep(); 
+            }
+            finally { 
+                RUN_BUTTON.disabled = false; 
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            // Initialize with Max Heap (Ascending Sort) selected
+            setHeapType('max'); 
+            renderStep(); 
+        });
+    </script>
+
+</body>
+
+</html>
